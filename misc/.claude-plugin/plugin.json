@@ -1,13 +1,13 @@
 {
   "name": "misc",
   "version": "0.1.0",
-  "description": "Miscellaneous personal skills — assorted utilities that don't belong to a focused plugin (PDF parsing, Claude Code hook notifications, etc.).",
+  "description": "Miscellaneous personal skills (PDF parsing, Claude Code hook notifications, etc.).",
   "author": {
     "name": "dev-goraebap",
     "email": "dev.goraebap@gmail.com"
   },
-  "homepage": "https://github.com/dev-goraebap/my-agent-kit",
-  "repository": "https://github.com/dev-goraebap/my-agent-kit",
+  "homepage": "https://github.com/dev-goraebap/skills",
+  "repository": "https://github.com/dev-goraebap/skills",
   "license": "MIT",
   "keywords": [
     "utilities",

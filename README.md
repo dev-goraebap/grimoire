@@ -1,4 +1,4 @@
-# my-agent-kit
+# skills
 
 개인용 **AI 에이전트 맞춤 환경**. 프로젝트마다 원하는 방식으로 에이전트(Claude Code, Cursor, Copilot, Codex, Windsurf, Gemini CLI 등)를 제어하기 위한 스킬을 모아두는 작업 공간입니다. 오픈소스 하네스를 필요에 따라 가져다 쓰면서 확장하고, 개인적으로 사용하는 유틸리티도 함께 보관합니다.
 
@@ -11,46 +11,14 @@
 
 ## 플러그인
 
-이 저장소는 마켓플레이스 **`dev-goraebap`** 역할을 하며, 다음 플러그인을 포함합니다:
+이 저장소는 마켓플레이스 **`devgoraebap-skills`** 역할을 하며, 다음 플러그인을 포함합니다:
 
 | 플러그인 | 설명 | 문서 |
 |---|---|---|
-| `agents-md-kit` | AGENTS.md 작성·큐레이션·유지보수 도구 모음 (공개 트랙) | [README](agents-md-kit/README.md) |
+| `agents-md-ops` | AGENTS.md 작성·큐레이션·유지보수 도구 모음 (공개 트랙) | [README](agents-md-ops/README.md) |
 | `misc` | 개인 잡동사니 스킬 모음 (개인 트랙) | [README](misc/README.md) |
 
-각 플러그인의 설치 방법과 포함된 스킬은 해당 README를 참고하세요.
-
-## 설치
-
-사용하는 에이전트에 따라 두 가지 방식으로 설치할 수 있습니다.
-
-### Claude Code — 마켓플레이스 등록
-
-```
-/plugin marketplace add dev-goraebap/my-agent-kit
-```
-
-등록 후에는 원하는 플러그인만 개별 설치합니다 (예: `/plugin install agents-md-kit@dev-goraebap`). 플러그인 단위로 업데이트를 Claude Code가 자동 관리합니다.
-
-### 그 외 에이전트 — `skills.sh`
-
-스킬 단위로 설치합니다. 플러그인 구조와 무관하게 필요한 스킬만 가져올 수 있습니다.
-
-```bash
-# 특정 스킬만 설치
-npx skills add dev-goraebap/my-agent-kit --skill <skill-name>
-
-# 예시
-npx skills add dev-goraebap/my-agent-kit --skill draft-agents-md
-npx skills add dev-goraebap/my-agent-kit --skill pdf-parser
-
-# 전역 설치(-g)
-npx skills add dev-goraebap/my-agent-kit --skill <skill-name> -g
-```
-
-업데이트가 필요하면 같은 명령을 다시 실행합니다.
-
-각 플러그인이 번들하는 스킬 목록과 상세한 사용법은 플러그인 README(위 표)를 참고하세요.
+Claude Code 마켓플레이스 등록과 `skills.sh` 설치 두 방식을 모두 지원합니다. 설치 방법과 포함 스킬은 각 트랙의 README를 참고하세요.
 
 ## 라이선스
 

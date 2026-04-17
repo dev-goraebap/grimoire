@@ -1,4 +1,4 @@
-# agents-md-kit
+# agents-md-ops
 
 **AGENTS.md 작성·큐레이션·유지보수**를 위한 도구 모음. 도구 중립 표준인 [AGENTS.md](https://agents.md)를 중심으로, 네이티브 지원이 없는 Claude Code/Gemini CLI용 브릿지도 함께 다룹니다.
 
@@ -14,17 +14,14 @@
 ### Claude Code (플러그인)
 
 ```
-/plugin marketplace add dev-goraebap/my-agent-kit
-/plugin install agents-md-kit@dev-goraebap
+/plugin marketplace add dev-goraebap/skills
+/plugin install agents-md-ops@devgoraebap-skills
 ```
 
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-# 특정 스킬만
-npx skills add dev-goraebap/my-agent-kit --skill draft-agents-md
-npx skills add dev-goraebap/my-agent-kit --skill refine-boundaries
-npx skills add dev-goraebap/my-agent-kit --skill audit-agents-md
+npx skills add dev-goraebap/skills --skill draft-agents-md --skill refine-boundaries --skill audit-agents-md
 ```
 
 ## 포함된 스킬
