@@ -1,6 +1,6 @@
 # AGENTS.md
 
-이 저장소는 **개인용 에이전트 튜닝 작업 공간**이다. Claude Code, Codex, Gemini 등 다양한 에이전트에서 사용할 **스킬(Agent Skills)**, **서브에이전트**, **훅/슬래시 커맨드** 같은 맞춤 구성요소를 제작·검증·배포하기 위한 곳이다.
+이 저장소는 **개인용 에이전트 스킬북**이다. Claude Code, Codex, Gemini 등 다양한 에이전트에서 사용할 **스킬(Agent Skills)**을 제작·검증·배포하기 위한 작업 공간이다. 훅·슬래시 커맨드는 Claude Code 플러그인 번들에 필요할 때만 함께 포함한다.
 
 전역 규칙은 `~/AGENTS.md`를 따르고, 이 파일은 **이 저장소 내 작업**에 한정된 규칙을 둔다.
 
@@ -142,7 +142,6 @@ allowed-tools: Bash Read Write    # 필요한 도구만 명시
 
 ### Never do
 
-- `.pen` 파일을 Read/Grep/Edit으로 직접 다룬다 — pencil MCP 도구로만 접근.
 - SKILL.md에서 `name`을 디렉토리명과 다르게 둔다.
 - `description`을 `"도움을 주는 스킬"`, `"파일을 다룹니다"` 같은 일반어로 작성한다.
 - SKILL.md 본문을 500줄 넘게 쓴다 — 초과분은 `references/`로 분할.
@@ -150,7 +149,7 @@ allowed-tools: Bash Read Write    # 필요한 도구만 명시
 - 민감 정보(API 키, 토큰, 개인 이메일 등)를 스킬 예시에 하드코딩한다.
 - 루트에 `.claude-plugin/plugin.json`을 둔다 — 루트의 `.claude-plugin/`은 `marketplace.json` 전용. 플러그인 매니페스트는 `<plugin-name>/.claude-plugin/plugin.json`에만 존재한다.
 - 루트에 `skills/` 디렉토리를 만든다 — 모든 스킬은 플러그인 안에 속한다.
-- 저장소 루트와 같은 이름의 플러그인을 만든다 — 리네임 후 경로가 `skills/skills/...`처럼 꼬인다.
+- 저장소 루트와 같은 이름의 플러그인을 만든다 — 리네임 후 경로가 `grimoire/grimoire/...`처럼 꼬인다.
 
 ## References
 
