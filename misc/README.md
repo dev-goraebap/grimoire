@@ -9,14 +9,14 @@
 ### Claude Code (플러그인)
 
 ```
-/plugin marketplace add dev-goraebap/skills
-/plugin install misc@devgoraebap-skills
+/plugin marketplace add dev-goraebap/grimoire
+/plugin install misc@grimoire
 ```
 
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/skills --skill pdf-parser --skill claude-hook-notify-setup
+npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup
 ```
 
 ## 포함된 스킬

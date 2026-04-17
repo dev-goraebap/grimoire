@@ -14,14 +14,14 @@
 ### Claude Code (플러그인)
 
 ```
-/plugin marketplace add dev-goraebap/skills
-/plugin install agents-md-ops@devgoraebap-skills
+/plugin marketplace add dev-goraebap/grimoire
+/plugin install agents-md-ops@grimoire
 ```
 
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/skills --skill draft-agents-md --skill refine-boundaries --skill audit-agents-md
+npx skills add dev-goraebap/grimoire --skill draft-agents-md --skill refine-boundaries --skill audit-agents-md
 ```
 
 ## 포함된 스킬
