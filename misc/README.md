@@ -1,24 +1,22 @@
 # misc
 
-**어디에도 안 속하는 개인 잡동사니 스킬 모음** (개인 트랙).
+**개인 잡동사니 스킬 모음** (개인 트랙).
 
-`agents-md-kit` 같이 주제가 명확한 플러그인으로 묶기 애매한 유틸리티들이 여기 모입니다. 공개 트랙과 달리 품질 보증이나 인터페이스 일관성은 보장하지 않으며, 개인 필요에 따라 변경·제거될 수 있습니다.
+`agents-md-ops` 같이 주제가 명확한 플러그인으로 묶기 애매한 유틸리티들이 여기 모입니다. 공개 트랙과 달리 품질 보증이나 인터페이스 일관성은 보장하지 않으며, 개인 필요에 따라 변경·제거될 수 있습니다.
 
 ## 설치
 
 ### Claude Code (플러그인)
 
 ```
-/plugin marketplace add dev-goraebap/my-agent-kit
-/plugin install misc@dev-goraebap
+/plugin marketplace add dev-goraebap/skills
+/plugin install misc@devgoraebap-skills
 ```
 
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-# 특정 스킬만 설치 (전체 설치보다 권장 — 잡동사니이므로 필요한 것만)
-npx skills add dev-goraebap/my-agent-kit --skill pdf-parser
-npx skills add dev-goraebap/my-agent-kit --skill claude-hook-notify-setup
+npx skills add dev-goraebap/skills --skill pdf-parser --skill claude-hook-notify-setup
 ```
 
 ## 포함된 스킬

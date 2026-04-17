@@ -1,20 +1,20 @@
 {
-  "name": "dev-goraebap",
+  "name": "devgoraebap-skills",
   "owner": {
     "name": "dev-goraebap",
     "email": "dev.goraebap@gmail.com"
   },
   "plugins": [
     {
-      "name": "agents-md-kit",
-      "source": "./agents-md-kit/",
+      "name": "agents-md-ops",
+      "source": "./agents-md-ops/",
       "description": "Toolkit for AGENTS.md covering the draft → grow → maintain lifecycle: draft-agents-md (draft generation from project analysis), refine-boundaries (error-driven Boundaries accumulation), audit-agents-md (anti-pattern diagnosis and consent-based improvement). Bridge support for Claude Code and Gemini CLI included.",
       "version": "0.2.0"
     },
     {
       "name": "misc",
       "source": "./misc/",
-      "description": "Miscellaneous personal skills — assorted utilities that don't belong to a focused plugin (PDF parsing, Claude Code hook notifications, etc.).",
+      "description": "Miscellaneous personal skills (PDF parsing, Claude Code hook notifications, etc.).",
       "version": "0.1.0"
     }
   ]
