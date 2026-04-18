@@ -1,5 +1,5 @@
 ---
-name: audit-agents-md
+name: audit-public-rules
 description: >
   AGENTS.md와 관련 브릿지 파일(CLAUDE.md, .claude/CLAUDE.md,
   CLAUDE.local.md)을 모범 사례에 대조해 진단하고, 이슈를 보고한 뒤
@@ -7,7 +7,7 @@ description: >
   linter 중복, 코드로 읽히는 내용, 오래된 경로, 크로스툴 중복, 개인
   설정 유출 등), 토큰 효율, 구조 체크, 레퍼런스 경로 검증을 수행.
   Triggers: "audit AGENTS.md", "check AGENTS.md", "review agent config",
-  "AGENTS.md 검토", "규칙 점검", "에이전트 설정 진단", "/audit-agents-md".
+  "AGENTS.md 검토", "규칙 점검", "에이전트 설정 진단", "/audit-public-rules".
   AGENTS.md를 수정한 뒤 품질을 확인하거나, 시간이 지나 규칙이 쌓였을
   때 정리가 필요할 때 사용.
 metadata:
@@ -15,7 +15,7 @@ metadata:
   version: "0.1.0"
 ---
 
-# audit-agents-md
+# audit-public-rules
 
 AGENTS.md와 관련 브릿지 파일을 진단해 **이슈를 보고하고, 사용자 동의를 받아 선택적으로 개선**한다.
 

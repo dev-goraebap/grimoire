@@ -1,5 +1,5 @@
 ---
-name: draft-agents-md
+name: draft-public-rules
 description: >
   현재 프로젝트를 분석하고, 사용자가 지금 접근 가능한 전역/프로젝트 스킬
   및 MCP 인벤토리를 함께 파악해서 **이 프로젝트에 실제로 필요한 것만**
@@ -20,7 +20,7 @@ metadata:
   version: "0.1.0"
 ---
 
-# draft-agents-md
+# draft-public-rules
 
 현재 프로젝트를 분석해 **AGENTS.md 초안**을 생성하고, 네이티브로 읽지 못하는 에이전트용 브릿지 파일을 함께 만든다. 이름 그대로 **초안**이며, 생성 후에도 후속 스킬로 계속 다듬어나가는 것을 전제로 한다.
 

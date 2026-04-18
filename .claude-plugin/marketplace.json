@@ -6,10 +6,10 @@
   },
   "plugins": [
     {
-      "name": "agents-md-ops",
-      "source": "./agents-md-ops/",
-      "description": "Toolkit for AGENTS.md covering the draft → grow → maintain lifecycle: draft-agents-md (draft generation from project analysis), refine-boundaries (error-driven Boundaries accumulation), audit-agents-md (anti-pattern diagnosis and consent-based improvement). Bridge support for Claude Code and Gemini CLI included.",
-      "version": "0.2.0"
+      "name": "agent-cowork",
+      "source": "./agent-cowork/",
+      "description": "Toolkit for AGENTS.md covering the draft → grow → maintain lifecycle: draft-public-rules (draft generation from project analysis), refine-boundaries (error-driven Boundaries accumulation), audit-public-rules (anti-pattern diagnosis and consent-based improvement). Bridge support for Claude Code and Gemini CLI included.",
+      "version": "0.3.0"
     },
     {
       "name": "misc",
