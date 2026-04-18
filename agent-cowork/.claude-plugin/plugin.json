@@ -1,7 +1,7 @@
 {
   "name": "agent-cowork",
-  "version": "0.3.0",
-  "description": "Toolkit for AGENTS.md covering the draft → grow → maintain lifecycle: draft-public-rules (draft generation from project analysis), refine-boundaries (error-driven Boundaries accumulation), audit-public-rules (anti-pattern diagnosis and consent-based improvement). Bridge support for Claude Code and Gemini CLI included.",
+  "version": "0.4.0",
+  "description": "Toolkit for agent cooperation covering two areas: (1) team public rules (AGENTS.md or CLAUDE.md) lifecycle — draft-public-rules (draft generation from project analysis), refine-boundaries (error-driven Boundaries accumulation), audit-public-rules (anti-pattern diagnosis and consent-based improvement); (2) multi-repo shared documentation via git submodule — shared-docs (init, sync, write/PR, doctor; GitHub Flow with GitHub and GitLab support).",
   "author": {
     "name": "dev-goraebap",
     "email": "dev.goraebap@gmail.com"

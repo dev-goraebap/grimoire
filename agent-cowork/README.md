@@ -1,9 +1,9 @@
 # agent-cowork
 
-**팀 공개 지침(public rules) 작성·큐레이션·유지보수**를 위한 도구 모음. 두 트랙 1차 지원:
+**에이전트 협업(agent cooperation)을 위한 도구 모음.** 팀이 공유하는 에이전트 자산의 운영을 돕습니다. 두 영역을 커버합니다:
 
-- **트랙 A (Multi-agent)** — 도구 중립 표준 [AGENTS.md](https://agents.md)를 source-of-truth로 두고, Claude Code/Gemini CLI는 한 줄짜리 브릿지로 연결
-- **트랙 B (Claude-only)** — 루트 `CLAUDE.md` 자체가 공개 지침. 브릿지 불필요
+- **팀 공개 지침 (public rules)** — 팀 전체가 참조하는 에이전트 운영 규칙. 트랙 A(루트 `AGENTS.md` + 브릿지) / 트랙 B(루트 `CLAUDE.md` 단독) 중 사용자가 명시 선택.
+- **멀티 레포 공유 문서** — 여러 레포가 공통으로 참조해야 할 문서(PRD, 도메인 규칙, ADR 등)를 git submodule로 관리.
 
 ## 이 플러그인의 설계 원칙
 
@@ -11,7 +11,7 @@
 - **Curate, don't enumerate.** `## External Tools`는 설치된 모든 도구의 덤프가 아니다. 이 프로젝트에 실제로 필요한 것만 담는다.
 - **Draft-first.** 분석 → 완성 초안 → 사용자 비판. 순차 인터뷰보다 한 번의 리뷰 루프가 낫다.
 - **최소로 시작.** 필수 섹션은 2개뿐. 나머지는 실제 내용이 있을 때만 등장한다.
-- **트랙은 사용자 선택.** 두 트랙은 우열이 아니라 팀 구성에 따른 선택. 자동 추측 금지.
+- **트랙·컨벤션은 사용자 선택.** 공개 지침 트랙(A/B), 공유 문서 경로·브랜치·PR 도구 — 모두 팀마다 다르므로 하드코딩 없이 주입.
 
 ## 설치
 
@@ -25,18 +25,28 @@
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/grimoire --skill draft-public-rules --skill refine-boundaries --skill audit-public-rules
+npx skills add dev-goraebap/grimoire --skill draft-public-rules --skill refine-boundaries --skill audit-public-rules --skill shared-docs
 ```
 
 ## 포함된 스킬
 
-공개 지침의 **생성 → 성장 → 유지보수** 라이프사이클을 세 스킬이 커버합니다.
+### 팀 공개 지침 (public rules)
+
+공개 지침 파일의 **생성 → 성장 → 유지보수** 라이프사이클을 세 스킬이 커버합니다.
 
 | 스킬 | 역할 |
 |---|---|
 | [`draft-public-rules`](skills/draft-public-rules/SKILL.md) | **생성** — 프로젝트 분석 + 인벤토리 큐레이션으로 공개 지침 초안 작성 |
 | [`refine-boundaries`](skills/refine-boundaries/SKILL.md) | **성장** — 에이전트 실수 1건마다 `## Boundaries`에 규칙 누적 |
 | [`audit-public-rules`](skills/audit-public-rules/SKILL.md) | **유지보수** — 품질 진단 후 사용자 동의 기반 개선 |
+
+### 멀티 레포 공유 문서
+
+| 스킬 | 역할 |
+|---|---|
+| [`shared-docs`](skills/shared-docs/SKILL.md) | 공유 문서 레포의 생성·연결·작성·동기화·진단 (git submodule 기반) |
+
+---
 
 ### `draft-public-rules` (v0.2.0)
 
@@ -110,6 +120,41 @@ CLAUDE.md 검토해줘
 
 자세한 진단 항목과 워크플로우는 [SKILL.md](skills/audit-public-rules/SKILL.md) 참조.
 
+### `shared-docs` (v0.1.0)
+
+여러 레포로 쪼개진 프로젝트(프론트/백/모바일/...)에서 **공유되어야 하는 문서**(공통 PRD, 도메인 규칙, 공통 ADR 등)를 하나의 git 레포로 분리하고, 각 프로젝트 레포에 **submodule로 연결**해서 운영합니다. 모노레포로 통합하지 않으면서 source-of-truth를 한 곳에 두는 패턴.
+
+한 스킬 안에 **4가지 동작**이 있으며, 사용자가 `/agent-cowork:shared-docs <동작>`로 호출하거나 발화 패턴으로 auto-trigger.
+
+| 동작 | 무엇을 하나 |
+|---|---|
+| `init` | 공유 문서 레포 신규 생성(`--create`) + 현재 레포에 submodule 연결 |
+| `sync` | 원격의 최신 커밋 받아오기 (`git submodule update --remote`) |
+| `write` | 문서 작성 → push → PR (GitHub Flow, 작은 수정은 main 직접) |
+| `doctor` | 빈 submodule, `.gitmodules` 불일치 등 흔한 함정 8종 검진 |
+
+**주요 동작:**
+
+- **경로·브랜치·원격 URL은 프로젝트별 config로 주입** — `.claude/shared-docs.json` 또는 `package.json`의 `"shared-docs"` 필드. 본문 하드코딩 금지 (팀마다 `docs/shared`, `docs-shared`, `ref/` 등 컨벤션이 다름)
+- **GitHub Flow 기본** — `main` 직접 push(작은 수정) vs feature 브랜치 + PR(큰 수정). 변경 분석 후 자동 분류하되 사용자 확인
+- **GitHub + GitLab 양쪽 지원** — `gh`/`glab` CLI 옵션 차이(`--base` vs `--target-branch`, `--body` vs `--description` 등) 매핑. self-hosted GitLab은 `GITLAB_URI` 환경변수로 호출 (전역 설정 비침투)
+- **인증 두 트랙 분리 안내** — git 인증(SSH/HTTPS)과 PR 도구 인증(`gh auth login` / `glab auth login`)을 별도로 검증
+- **머지는 항상 사용자 동의 후** — `--auto`(CI 통과 시 자동 머지)는 명시 요청 시만
+- **doctor의 자동 수정도 사용자 동의 기반** — 안전한 항목도 "전부 적용"을 기본값으로 두지 않음
+
+**트리거 예시:**
+
+```
+이 프로젝트에 공유 문서 submodule 연결해줘
+공유 문서 최신으로 받아줘
+도메인 규칙에 X 추가하고 PR 만들어줘
+shared docs 상태 점검
+/agent-cowork:shared-docs init
+/agent-cowork:shared-docs sync
+```
+
+자세한 설계와 동작별 워크플로우는 [SKILL.md](skills/shared-docs/SKILL.md) 참조. 각 동작의 상세(명령·트러블슈팅·호스트별 분기)는 `skills/shared-docs/references/`에 분리.
+
 ## 로드맵
 
 앞으로 추가 예정:
@@ -117,6 +162,7 @@ CLAUDE.md 검토해줘
 - **Stop hook 연동 실험** — 턴 종료 시 에이전트가 자체적으로 "실수했나?" 점검해 `refine-boundaries`를 자동 호출
 - **스킬/MCP 정리 스킬** — `## External Tools`를 source of truth로 삼아 전역에 남아있는 미사용 도구 식별
 - **섹션별 관리 스킬** — `/manage-refs`, `/manage-tools`, `/git-workflow` 등 각 섹션의 점진적 업데이트
+- **shared-docs 확장** — 독립 clone(형제 디렉토리) 대안 지원, 다른 워크플로우(trunk-based 등) 옵션 추가
 
 ## 라이선스
 
