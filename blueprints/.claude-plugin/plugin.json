@@ -1,0 +1,22 @@
+{
+  "name": "blueprints",
+  "version": "0.1.0",
+  "description": "Design-doc skills that support implementation: Lean PRD (vision + scope), ERD (entity-relationship diagrams, 3 levels), domain-model (bounded context + invariants), policy-book (business policies with POL-XXXX IDs and ADR-style lifecycle). All skills share a naming philosophy (no 'make-' prefix = ongoing maintenance) and store per-project paths in AGENTS.md/CLAUDE.md rather than separate config files.",
+  "author": {
+    "name": "dev-goraebap",
+    "email": "dev.goraebap@gmail.com"
+  },
+  "homepage": "https://github.com/dev-goraebap/grimoire",
+  "repository": "https://github.com/dev-goraebap/grimoire",
+  "license": "MIT",
+  "keywords": [
+    "prd",
+    "erd",
+    "domain-model",
+    "policy",
+    "design-docs",
+    "blueprints",
+    "adr",
+    "agent-skills"
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "name": "misc",
-  "version": "0.6.0",
-  "description": "Miscellaneous personal skills (PDF parsing, Claude Code hook notifications, Lean PRD, Mermaid ERD, etc.).",
+  "version": "0.7.0",
+  "description": "Miscellaneous personal skills (PDF parsing, Claude Code hook notifications, tech docs to Markdown, FSD knowledge pack). Design-doc skills moved to the blueprints plugin.",
   "author": {
     "name": "dev-goraebap",
     "email": "dev.goraebap@gmail.com"
@@ -14,9 +14,6 @@
     "pdf",
     "notification",
     "claude-code-hook",
-    "prd",
-    "erd",
-    "mermaid",
     "personal"
   ]
 }

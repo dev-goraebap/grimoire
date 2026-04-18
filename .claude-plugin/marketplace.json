@@ -14,8 +14,14 @@
     {
       "name": "misc",
       "source": "./misc/",
-      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack), lean-prd (interview-based lightweight PRD generator with personal/internal/product type references), erd (Mermaid ERD generator supporting conceptual/logical/physical levels with dark+handDrawn styling).",
-      "version": "0.6.0"
+      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack).",
+      "version": "0.7.0"
+    },
+    {
+      "name": "blueprints",
+      "source": "./blueprints/",
+      "description": "Design-doc skills that support implementation: lean-prd (interview-based lightweight PRD), erd (Mermaid ERD at conceptual/logical/physical levels), domain-model (bounded context with Ubiquitous Language and invariants), policy-book (ADR-style business policy registry with POL-XXXX IDs). All skills use AGENTS.md/CLAUDE.md to store per-project paths instead of separate config files, and share a no-prefix naming philosophy for ongoing-maintenance documents.",
+      "version": "0.1.0"
     }
   ]
 }
