@@ -1,7 +1,7 @@
 {
   "name": "misc",
-  "version": "0.4.0",
-  "description": "Miscellaneous personal skills (PDF parsing, Claude Code hook notifications, etc.).",
+  "version": "0.6.0",
+  "description": "Miscellaneous personal skills (PDF parsing, Claude Code hook notifications, Lean PRD, Mermaid ERD, etc.).",
   "author": {
     "name": "dev-goraebap",
     "email": "dev.goraebap@gmail.com"
@@ -14,6 +14,9 @@
     "pdf",
     "notification",
     "claude-code-hook",
+    "prd",
+    "erd",
+    "mermaid",
     "personal"
   ]
 }

@@ -14,8 +14,8 @@
     {
       "name": "misc",
       "source": "./misc/",
-      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack).",
-      "version": "0.4.0"
+      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack), lean-prd (interview-based lightweight PRD generator with personal/internal/product type references), erd (Mermaid ERD generator supporting conceptual/logical/physical levels with dark+handDrawn styling).",
+      "version": "0.6.0"
     }
   ]
 }
