@@ -37,12 +37,12 @@ grimoire/
 
 현재 등록된 플러그인:
 
-- **`agents-md-ops`** — AGENTS.md 작성·큐레이션·유지보수 도구 모음 (공개 트랙)
+- **`agent-cowork`** — 팀 공개 지침(AGENTS.md/CLAUDE.md) 작성·큐레이션·유지보수 도구 모음 (공개 트랙)
 - **`misc`** — 개인 잡동사니 스킬 모음 (개인 트랙)
 
 **규칙:**
 - 신규 플러그인은 저장소 루트 바로 아래(`<repo>/<plugin-name>/`)에 배치한다. 루트에 `.claude-plugin/plugin.json`을 두지 않는다 (루트의 `.claude-plugin/`은 `marketplace.json` 전용).
-- 플러그인 이름은 **범용적이고 결합도 낮은** 이름을 쓴다 (예: `agents-md-ops`). 저장소 이름(`grimoire`)과 겹치지 않도록 한다.
+- 플러그인 이름은 **범용적이고 결합도 낮은** 이름을 쓴다 (예: `agent-cowork`). 저장소 이름(`grimoire`)과 겹치지 않도록 한다.
 - 스킬은 반드시 플러그인 안에 속한다. 저장소 루트에 `skills/` 디렉토리를 만들지 않는다.
 - 새 플러그인을 추가하면 `marketplace.json`의 `plugins[]`에 반드시 엔트리를 등록한다 (`name`, `source`, `description`, `version`).
 - 서브에이전트는 `.claude/agents/`에 배치(저장소 외부 개인 설정) — 이 저장소에서는 관리하지 않는다.

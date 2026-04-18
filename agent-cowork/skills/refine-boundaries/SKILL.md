@@ -1,12 +1,14 @@
 ---
 name: refine-boundaries
 description: >
-  AGENTS.md의 `## Boundaries` 섹션에 규칙을 한 번에 한 개씩 누적한다.
-  사용자가 에이전트 실수를 지적하거나 규칙을 명시적으로 선언할 때 자동
-  발화하거나 슬래시로 호출. 3-tier(Always do / Ask first / Never do)
-  중 적절한 곳에 분류하고, 토픽 특정적이면 해당 섹션(Code Style, Testing,
-  Git Workflow 등)에 인라인으로, 크로스커팅이면 Boundaries에 배치한다.
-  기존 규칙은 건드리지 않는 **additive-only** 스킬.
+  공개 지침 파일(트랙 A: 루트 `AGENTS.md` / 트랙 B: 루트 `CLAUDE.md`)의
+  `## Boundaries` 섹션에 규칙을 한 번에 한 개씩 누적한다. 트랙은 자동
+  감지(우선순위: AGENTS.md > CLAUDE.md). 사용자가 에이전트 실수를
+  지적하거나 규칙을 명시적으로 선언할 때 자동 발화하거나 슬래시로 호출.
+  3-tier(Always do / Ask first / Never do) 중 적절한 곳에 분류하고,
+  토픽 특정적이면 해당 섹션(Code Style, Testing, Git Workflow 등)에
+  인라인으로, 크로스커팅이면 Boundaries에 배치한다. 기존 규칙은
+  건드리지 않는 **additive-only** 스킬.
   Triggers: "refine boundaries", "add boundary", "add never do",
   "add always do", "다시는 이렇게 하지 마", "항상 ~ 먼저 해",
   "에이전트가 실수했어", "/refine-boundaries".
@@ -15,12 +17,14 @@ description: >
   에이전트 실수를 본 직후, 또는 사용자가 새 규칙을 선언할 때 사용.
 metadata:
   author: dev-goraebap
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # refine-boundaries
 
-AGENTS.md의 `## Boundaries` 섹션을 **프로젝트 수명 동안 지속적으로 성장시키는** 스킬. 에이전트가 실수할 때마다 교정 내용을 이 섹션에 누적해두면, 다음 에이전트가 같은 실수를 반복하기 전에 이 섹션을 읽고 참고한다.
+공개 지침 파일(트랙 A: `AGENTS.md` / 트랙 B: `CLAUDE.md`)의 `## Boundaries` 섹션을 **프로젝트 수명 동안 지속적으로 성장시키는** 스킬. 에이전트가 실수할 때마다 교정 내용을 이 섹션에 누적해두면, 다음 에이전트가 같은 실수를 반복하기 전에 이 섹션을 읽고 참고한다.
+
+source 파일은 자동 감지: 루트 `AGENTS.md` 우선, 없으면 `CLAUDE.md`. 슬래시 호출 시 `--track=A|B` 인자로 명시 가능.
 
 ## 철학
 
@@ -46,11 +50,12 @@ AGENTS.md의 `## Boundaries` 섹션을 **프로젝트 수명 동안 지속적으
 
 | # | 확인 | 실패 시 |
 |---|---|---|
-| 1 | `AGENTS.md`가 프로젝트 루트에 존재 | "AGENTS.md가 없습니다. `/draft-agents-md`로 먼저 생성하세요." |
+| 1 | source 파일(`AGENTS.md` 또는 `CLAUDE.md`)이 프로젝트 루트에 존재 | "공개 지침 파일이 없습니다. `/draft-public-rules`로 먼저 생성하세요." |
+| 2 | 둘 다 존재 시 트랙 결정 | 우선순위: AGENTS.md > CLAUDE.md. `--track=B`로 강제 가능. CLAUDE.md가 `@AGENTS.md` 한 줄(import-only)이면 AGENTS.md를 source로 사용하고 CLAUDE.md는 건드리지 않는다 |
 
 ## 언어 정책
 
-사용자 대면 메시지는 **사용자 언어**. AGENTS.md에 기록하는 규칙 본문도 **사용자 언어** (draft-agents-md와 동일 정책). 단, 구조적 요소는 영어 고정:
+사용자 대면 메시지는 **사용자 언어**. source 파일에 기록하는 규칙 본문도 **사용자 언어** (draft-public-rules와 동일 정책). 단, 구조적 요소는 영어 고정:
 - 섹션 헤딩(`## Boundaries`), 서브헤딩(`### Always do` / `### Ask first` / `### Never do`)
 - tier prefix(`**ALWAYS**`, `**ASK FIRST**`, `**NEVER**`)
 
@@ -142,7 +147,7 @@ AGENTS.md의 `## Boundaries` 섹션을 **프로젝트 수명 동안 지속적으
 
 ### Step 6: Boundaries 섹션 신규 생성 (필요 시)
 
-크로스커팅 규칙인데 `## Boundaries`가 없으면, 파일 끝에 다음 구조로 생성:
+크로스커팅 규칙인데 source 파일에 `## Boundaries`가 없으면, source 파일(트랙별) 끝에 다음 구조로 생성:
 
 ```markdown
 ## Boundaries
@@ -165,3 +170,4 @@ AGENTS.md의 `## Boundaries` 섹션을 **프로젝트 수명 동안 지속적으
 - **3-tier 구조 평탄화** — 항상 Always/Ask/Never 서브헤딩 보존
 - **한 번의 호출에서 여러 규칙 배치 추가** (1 invocation = 1 rule, 분류의 신중성 유지)
 - 토픽 섹션의 기존 규칙 순서 재배열
+- 자동 감지 우선순위(AGENTS.md > CLAUDE.md)를 무시하고 두 파일 모두 수정 — 한 호출에 source 파일 하나만 변경
