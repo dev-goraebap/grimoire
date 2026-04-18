@@ -1,11 +1,11 @@
 ---
 name: handoff
 description: >-
-  지금 대화 맥락을 다른 에이전트(Claude Code, Codex, Gemini CLI, Cursor 등)에 그대로 넘길 수 있는 brief Markdown을 자동 생성한다.
-  사용자가 `/handoff`만 입력하면 현재 대화에서 지금 해결하려는 task 하나를 뽑아
+  지금 대화 맥락을 **다른 작업 환경의 에이전트(Claude Code, Codex, Gemini CLI, Cursor 등)나 다른 팀원에게** 그대로 넘길 수 있는 brief Markdown을 자동 생성한다.
+  사용자가 `/agent-cowork:handoff`(또는 `/handoff`)를 입력하면 현재 대화에서 지금 해결하려는 task 하나를 뽑아
   "# 요청 / ## 배경 / ## 목표 / ## 산출물 / ## 이미 확보한 것 / ## 주의사항" 구조로 정리해 채팅에 출력한다.
   200–400 단어의 에이전트 독립적인 brief로, 받는 쪽이 cold start 상태에서도 즉시 이해 가능해야 한다.
-  Triggers — "/handoff", "이 내용 다른 에이전트에 전달", "brief 만들어줘", "맥락 정리해서 넘기게 해줘", "다른 에이전트한테 이어서 시킬 수 있게".
+  Triggers — "/agent-cowork:handoff", "/handoff", "이 내용 다른 에이전트에 전달", "brief 만들어줘", "맥락 정리해서 넘기게 해줘", "다른 에이전트한테 이어서 시킬 수 있게", "다른 팀원한테 전달할 수 있게 정리".
 license: Apache-2.0
 ---
 
@@ -15,7 +15,7 @@ license: Apache-2.0
 
 ## 사용 시점
 
-- 사용자가 **`/handoff`** 를 입력했을 때. 인자 없음 — 맥락은 에이전트가 알아서 파악.
+- 사용자가 **`/agent-cowork:handoff`** 또는 단축 트리거 **`/handoff`** 를 입력했을 때. 인자 없음 — 맥락은 에이전트가 알아서 파악.
 - 자연어로 "이 내용 다른 에이전트에 전달할 수 있게 정리해줘", "brief 만들어줘", "맥락 정리해서 넘겨줄래" 같은 요청이 있을 때.
 - 사용자가 "지금 이 주제를 새 창/다른 도구에서 이어가려고 한다"는 의사를 밝힐 때.
 

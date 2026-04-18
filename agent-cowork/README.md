@@ -1,9 +1,10 @@
 # agent-cowork
 
-**에이전트 협업(agent cooperation)을 위한 도구 모음.** 팀이 공유하는 에이전트 자산의 운영을 돕습니다. 두 영역을 커버합니다:
+**에이전트 협업(agent cooperation)을 위한 도구 모음.** 팀이 공유하는 에이전트 자산의 운영 + 에이전트 간 컨텍스트 이관을 돕습니다. 세 영역:
 
 - **팀 공개 지침 (public rules)** — 팀 전체가 참조하는 에이전트 운영 규칙. 트랙 A(루트 `AGENTS.md` + 브릿지) / 트랙 B(루트 `CLAUDE.md` 단독) 중 사용자가 명시 선택.
 - **멀티 레포 공유 문서** — 여러 레포가 공통으로 참조해야 할 문서(PRD, 도메인 규칙, ADR 등)를 git submodule로 관리.
+- **에이전트 간 컨텍스트 이관** — 지금 세션 맥락을 다른 에이전트(Claude/Codex/Gemini/Cursor)나 다른 팀원에게 넘길 brief를 즉석에서 생성.
 
 ## 이 플러그인의 설계 원칙
 
@@ -25,7 +26,7 @@
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/grimoire --skill draft-public-rules --skill refine-boundaries --skill audit-public-rules --skill shared-docs
+npx skills add dev-goraebap/grimoire --skill draft-public-rules --skill refine-boundaries --skill audit-public-rules --skill shared-docs --skill handoff
 ```
 
 ## 포함된 스킬
@@ -45,6 +46,12 @@ npx skills add dev-goraebap/grimoire --skill draft-public-rules --skill refine-b
 | 스킬 | 역할 |
 |---|---|
 | [`shared-docs`](skills/shared-docs/SKILL.md) | 공유 문서 레포의 생성·연결·작성·동기화·진단 (git submodule 기반) |
+
+### 에이전트 간 컨텍스트 이관
+
+| 스킬 | 역할 |
+|---|---|
+| [`handoff`](skills/handoff/SKILL.md) | 현재 대화 맥락을 다른 에이전트·팀원에게 넘길 brief Markdown을 즉석 생성 |
 
 ---
 
@@ -154,6 +161,29 @@ shared docs 상태 점검
 ```
 
 자세한 설계와 동작별 워크플로우는 [SKILL.md](skills/shared-docs/SKILL.md) 참조. 각 동작의 상세(명령·트러블슈팅·호스트별 분기)는 `skills/shared-docs/references/`에 분리.
+
+### `handoff` (v1.0)
+
+지금 세션의 맥락을 **다른 작업 환경의 에이전트나 다른 팀원에게** 그대로 넘겨주기 위한 brief Markdown을 즉석에서 만듭니다. 다른 CLI/IDE에서 같은 task를 이어가거나 분업할 때, 매번 수작업으로 배경을 다시 쓰는 비용을 줄이는 것이 목적.
+
+**주요 동작:**
+
+- **한 가지 task에 집중** — 대화 전체를 되돌아보고 사용자가 지금 집중하는 task 하나만 추출. 여러 주제가 섞여 있으면 가장 최근에 합의된 것
+- **에이전트 독립 brief** — 특정 CLI/IDE 기능(`Skill`, `WebFetch`, MCP 서버 이름 등)을 전제로 쓰지 않음. 받는 쪽이 무엇이든 cold start로 10초 안에 이해
+- **200–400 단어** — 짧으면 정보 부족, 길면 핵심 상실. 고정 섹션: `# 요청 / ## 배경 / ## 목표 / ## 산출물 / ## 이미 확보한 것 / ## 주의사항`
+- **파일 저장 X, 채팅 출력만** — 사용자가 복사해 다른 환경에 붙여넣는 구조. 명시 요청 시에만 파일화 (범위 밖)
+- **이미 배제된 옵션은 "주의사항"에 한 줄만** — 받는 에이전트가 결정 뒤집지 않도록 결과만 전달
+
+**트리거 예시:**
+
+```
+이 내용 다른 에이전트한테 전달할 수 있게 정리해줘
+brief 만들어줘 — 이어서 Codex에서 작업할거야
+다른 팀원한테 지금까지 맥락 넘기게 정리
+/agent-cowork:handoff
+```
+
+자세한 템플릿·작성 원칙은 [SKILL.md](skills/handoff/SKILL.md) 참조.
 
 ## 로드맵
 

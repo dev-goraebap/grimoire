@@ -8,14 +8,14 @@
     {
       "name": "agent-cowork",
       "source": "./agent-cowork/",
-      "description": "Toolkit for agent cooperation covering two areas: (1) team public rules (AGENTS.md or CLAUDE.md) lifecycle — draft-public-rules (draft generation from project analysis), refine-boundaries (error-driven Boundaries accumulation), audit-public-rules (anti-pattern diagnosis and consent-based improvement); (2) multi-repo shared documentation via git submodule — shared-docs (init, sync, write/PR, doctor; GitHub Flow with GitHub and GitLab support).",
-      "version": "0.4.0"
+      "description": "Toolkit for agent cooperation covering three areas: (1) team public rules (AGENTS.md or CLAUDE.md) lifecycle — draft-public-rules (draft generation from project analysis), refine-boundaries (error-driven Boundaries accumulation), audit-public-rules (anti-pattern diagnosis and consent-based improvement); (2) multi-repo shared documentation via git submodule — shared-docs (init, sync, write/PR, doctor; GitHub Flow with GitHub and GitLab support); (3) agent context handoff brief generation — handoff (ephemeral brief Markdown for cross-agent or cross-teammate task transfer).",
+      "version": "0.5.0"
     },
     {
       "name": "misc",
       "source": "./misc/",
-      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack), handoff (generate agent-to-agent brief from current conversation).",
-      "version": "0.3.0"
+      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack).",
+      "version": "0.4.0"
     }
   ]
 }
