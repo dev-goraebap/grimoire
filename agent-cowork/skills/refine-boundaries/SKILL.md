@@ -17,7 +17,7 @@ description: >
   에이전트 실수를 본 직후, 또는 사용자가 새 규칙을 선언할 때 사용.
 metadata:
   author: dev-goraebap
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # refine-boundaries
