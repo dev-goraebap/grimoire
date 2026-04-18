@@ -16,7 +16,7 @@
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup --skill docs-to-md --skill fsd-docs
+npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup --skill docs-to-md --skill fsd-docs --skill handoff
 ```
 
 ## 포함된 스킬
@@ -118,6 +118,29 @@ FSD에서 cross-import는 어떻게 처리해?
 **라이선스:** 원문은 MIT (© 2018-2026 Feature-Sliced Design core-team). [`LICENSE.md`](skills/fsd-docs/LICENSE.md)에 전문 포함.
 
 자세한 인덱스는 [SKILL.md](skills/fsd-docs/SKILL.md) 참조.
+
+---
+
+### `handoff` (v1.0)
+
+**지금 대화 맥락을 다른 에이전트(Claude Code, Codex, Gemini CLI, Cursor 등)에 넘길 brief Markdown을 자동 생성**합니다. `/handoff`만 치면 에이전트가 현재 대화에서 지금 해결하려는 task 하나를 뽑아 `# 요청 / ## 배경 / ## 목표 / ## 산출물 / ## 이미 확보한 것 / ## 주의사항` 구조로 정리해 채팅에 출력.
+
+**사용 예:**
+
+```
+/handoff
+이 내용 다른 에이전트한테 전달할 수 있게 정리해줘
+brief 만들어줘
+```
+
+**특징:**
+- **에이전트 독립적** brief (특정 CLI/IDE 전제 없음). 받는 쪽이 cold start로 10초 안에 이해 가능한 200–400 단어.
+- 파일로 저장하지 않고 채팅에 **복붙용 Markdown**으로 출력.
+- 완료된 작업과 지금 넘기는 task를 구분해, 받는 에이전트가 이미 내려진 결정을 뒤집지 않도록.
+
+**요구:** 없음 (에이전트 내부 맥락만 사용)
+
+자세한 템플릿·작성 원칙은 [SKILL.md](skills/handoff/SKILL.md) 참조.
 
 ## 주의
 

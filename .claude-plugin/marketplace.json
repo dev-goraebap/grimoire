@@ -14,8 +14,8 @@
     {
       "name": "misc",
       "source": "./misc/",
-      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack).",
-      "version": "0.2.0"
+      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack), handoff (generate agent-to-agent brief from current conversation).",
+      "version": "0.3.0"
     }
   ]
 }
