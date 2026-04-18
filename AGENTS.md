@@ -163,6 +163,7 @@ allowed-tools: Bash Read Write    # 필요한 도구만 명시
 - 루트에 `.claude-plugin/plugin.json`을 둔다 — 루트의 `.claude-plugin/`은 `marketplace.json` 전용. 플러그인 매니페스트는 `<plugin-name>/.claude-plugin/plugin.json`에만 존재한다.
 - 루트에 `skills/` 디렉토리를 만든다 — 모든 스킬은 플러그인 안에 속한다.
 - 저장소 루트와 같은 이름의 플러그인을 만든다 — 리네임 후 경로가 `grimoire/grimoire/...`처럼 꼬인다.
+- 스킬이 프로젝트별 경로·선호·옵션·상태를 저장한다면서 별도 config 파일(`.xxx.json` 등)을 만든다 — 저장소 공유 규약은 `AGENTS.md`/`CLAUDE.md` 섹션에, 개인 기본값은 개인 메모리에 두는 것으로 해결한다. 에이전트가 자동으로 읽는 전역 규약을 우선 활용한다.
 
 ## References
 
