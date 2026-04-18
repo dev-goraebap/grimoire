@@ -16,7 +16,7 @@
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup
+npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup --skill docs-to-md --skill fsd-docs
 ```
 
 ## 포함된 스킬
@@ -68,6 +68,56 @@ claude 알림 받고 싶어
 **호환성:** Claude Code 전용 (다른 에이전트는 hook 구조가 달라 적용 불가)
 
 자세한 설치·등록 절차는 [SKILL.md](skills/claude-hook-notify-setup/SKILL.md) 참조.
+
+---
+
+### `docs-to-md` (v1.0)
+
+기술 공식 문서 사이트의 URL을 받아 **로컬 Markdown**으로 저장합니다. `llms-full.txt` → `llms.txt` → `sitemap.xml` → nav 링크 → 단일 페이지 순으로 페이지를 자동 발견하고, `WebFetch`로 각 페이지를 Markdown 변환해 1페이지면 단일 `.md`, 여러 개면 폴더 + `index.md` 구조로 떨어뜨립니다.
+
+**사용 예:**
+
+```
+/docs-to-md https://feature-sliced.design/ ./docs/fsd/
+https://react.dev/reference/react/useState 이거 md로 저장해줘
+```
+
+**특징:**
+- `llms-full.txt` 제공 사이트(Vercel, Supabase, Next.js 등)는 한 파일로 풀텍스트 확보
+- 5페이지 초과 시 사용자에게 목록 확인 후 진행
+- 각 파일 frontmatter에 `source_url`, `fetched_at` 자동 기록 (stale 판별)
+
+**요구:** Node.js 18+ (스크립트는 의존성 없음)
+
+자세한 절차·폴백 전략·프레임워크별 팁은 [SKILL.md](skills/docs-to-md/SKILL.md) 참조.
+
+---
+
+### `fsd-docs` (v1.0)
+
+**Feature-Sliced Design v2.1 공식 문서** 지식 스킬. SKILL.md는 라우팅 테이블 역할만 하고, 실제 지식은 8개 섹션(`references/00-overview.md` ~ `07-philosophy-and-faq.md`)으로 분할되어 필요할 때만 로드됩니다(Progressive Disclosure).
+
+**사용 예:**
+
+```
+FSD에서 pages-first 마이그레이션이 뭐야?
+우리 프로젝트에 FSD 도입하는 게 맞을까?
+FSD에서 cross-import는 어떻게 처리해?
+```
+
+**포함 섹션:**
+- `00-overview.md` — 개요, 적합성 판단, incremental adoption
+- `01-core-reference.md` — Layers, Public API, Slices/Segments
+- `02-tutorial.md` — 실전 튜토리얼 (on paper + in code)
+- `03-cross-imports-and-antipatterns.md` — cross-import, desegmentation, excessive entities, routing
+- `04-migration.md` — **v2.0→v2.1 (pages-first)**, v1→v2, Custom→FSD ⭐
+- `05-framework-integrations.md` — Next.js, NuxtJS, SvelteKit, React Query, Electron
+- `06-practical-guides.md` — API, Auth, i18n, Types, Page layouts, Theme, SSR
+- `07-philosophy-and-faq.md` — Alternatives 비교(DDD/Clean/Atomic), 철학, FAQ
+
+**라이선스:** 원문은 MIT (© 2018-2026 Feature-Sliced Design core-team). [`LICENSE.md`](skills/fsd-docs/LICENSE.md)에 전문 포함.
+
+자세한 인덱스는 [SKILL.md](skills/fsd-docs/SKILL.md) 참조.
 
 ## 주의
 
