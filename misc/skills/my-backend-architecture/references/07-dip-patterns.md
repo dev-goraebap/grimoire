@@ -21,7 +21,7 @@ app/employees/employees.service.ts
 
 ### 시나리오 B — domain Bounded Context 간
 
-다중 Context 시나리오(2)에서 `domain/payroll`이 `domain/organization`의 Employee 정보를 필요로 한다.
+Slice 방식 domain(다중 Bounded Context)에서 `domain/payroll`이 `domain/organization`의 Employee 정보를 필요로 한다.
 
 ```
 domain/payroll/payroll.service.ts
@@ -131,7 +131,7 @@ B안에서 인터페이스 이름은 **동사 중심**으로 — "what it does" 
 - Good: `PostRemover`, `UserSuspender`, `OrderApprover`
 - Bad: `IPostsService`, `PostsServiceInterface` (구현체에 종속)
 
-인터페이스 이름이 도메인 **Ubiquitous Language**(`blueprints:domain-model`의 DOMAIN.md)를 따르면 팀 전체가 같은 어휘를 쓴다.
+인터페이스 이름이 도메인의 업무 용어(Ubiquitous Language)를 따르면 팀 전체가 같은 어휘를 쓴다.
 
 ## shared → domain 역참조 회피
 

@@ -116,7 +116,161 @@ app/users/
 - **Service** (`app/employees/employees.service.ts`): domain의 리포지토리 인터페이스(`EmployeeRepository`)와 도메인 서비스를 주입받아 오케스트레이션. 트랜잭션 블록에서 `employee = await employeeRepository.create(...)` → 도메인 이벤트 발행 → 환영 이메일(Notification) 발송.
 - **도메인 호출은 전부 리포지토리 인터페이스 / 도메인 엔티티 메서드**만 사용. ORM 구체 타입(`TypeOrmRepository<Employee>`)은 app 서비스에 등장하지 않음 — infrastructure가 감싼다.
 
-시나리오 2(다중 Context)에서 여러 Context를 엮는 경우 — 예: `onboardEmployee` 유스케이스가 `domain/organization` + `domain/payroll`을 모두 참조 — app 서비스가 커지면 `use-cases/onboard-employee`로 승격 ([`07-dip-patterns.md`](07-dip-patterns.md) A안).
+Slice 방식 domain(다중 Context)에서 여러 Context를 엮는 경우 — 예: `onboardEmployee`가 `domain/organization` + `domain/payroll`을 모두 참조 — app 서비스가 커지면 `use-cases/onboard-employee`로 승격 ([`07-dip-patterns.md`](07-dip-patterns.md) A안).
+
+## 읽기와 쓰기의 다른 경로 (CQRS 경량 적용)
+
+앱 요청은 크게 **쓰기**(데이터 변경)와 **읽기**(화면 조회)로 나뉜다. 이 스킬은 두 경로를 **다른 레이어 조합**으로 처리한다. CQRS(Command Query Responsibility Segregation)의 가벼운 적용 — 쓰기/읽기 DB 분리나 이벤트 소싱까지 가지 않고 **코드 조직만 분리**한다.
+
+### 쓰기 경로 (Command)
+
+불변 규칙·상태 전이 검증이 필요하므로 반드시 domain을 경유한다.
+
+```
+Controller → App Service → Domain Service / Entity method
+            → Repository interface (domain)
+            → (DI 런타임) → Repository 구현체 (infrastructure)
+```
+
+#### 쓰기 경로에서도 조회는 필요하다
+
+"쓰기"라고 저장만 한다는 뜻이 아니다. 상태 변경 전 **현재 상태 로드**가 필수.
+
+- `update()` 하려면 `findById()`로 먼저 읽어야 함
+- 이메일 중복 검사 → `findByEmail()`
+- 상태 전이 정책 대상 집합 로드 → `findByStatus('pending')`
+
+이 조회는 **리포지토리가 담당**한다. Query Service가 아니라.
+
+#### 리포지토리 조회의 범위 (조인 제한)
+
+리포지토리가 제공할 조회는 **자기 Aggregate 경계 안**으로 제한한다.
+
+| 조인 유형 | 리포지토리에서 허용? | 해법 |
+|---|---|---|
+| 같은 Aggregate 내부 연관 | ✅ (예: Order ↔ OrderItem) | 리포지토리 메서드 |
+| 같은 Context의 다른 Aggregate | ⚠ 가급적 피함 | 각 리포지토리 호출 후 메모리 조합. 성능 이슈 있을 때만 조인 |
+| **다른 Context의 데이터 조인** | ❌ | Query Service로 뺀다 (아래 참조) |
+
+이 범위를 지키는 이유: 리포지토리가 "화면용 만능 조회 메서드"로 비대해지면 Aggregate 경계가 희미해지고 트랜잭션 경계도 흐려진다.
+
+### 읽기 경로 (Query)
+
+화면 조회는 비즈니스 규칙 적용이 필요 없다. DB에서 화면 모양으로 뽑아오면 끝. **domain을 우회**한다.
+
+#### 1. 단일 Context 화면 조회
+
+가장 흔한 경우 — 한 Context의 데이터만 필요.
+
+```
+Controller → Query Service (infrastructure) → DB
+```
+
+- App 서비스는 **생략 가능**. 컨트롤러가 infrastructure의 query service를 직접 주입·호출.
+- Query service는 domain 모델이 아니라 **화면용 DTO**를 바로 반환.
+- 필요하면 app 서비스에 얇은 래퍼를 두되 (응답 변환·인증 필터 집중) query service 호출에 위임.
+
+#### 2. 다중 Context 조합 조회
+
+화면이 여러 Context의 데이터를 함께 보여주는 경우 (예: 직원 대시보드 = 조직 정보 + 급여 요약 + 근태 현황). 두 옵션이 있고 상황에 따라 선택.
+
+##### 옵션 A — 단일 통합 Query Service
+
+한 query service가 여러 Context 테이블을 **DB 조인 한 번**에 뽑는다.
+
+```
+infrastructure/queries/
+└── employee-dashboard.query-service.ts
+    └─ employees + payrolls + attendances 테이블을
+       한 SELECT로 조인해 DashboardDto 반환
+```
+
+Controller가 직접 이 query service를 호출 (use-case 생략).
+
+**적합**: 단일 DB / 성능 중요 / 실시간 최신 데이터 / Context 경계를 읽기에선 완화해도 되는 상황.
+
+이 방식은 CQRS의 전형 관점 — **Read side는 Context 경계를 덜 엄격히** 적용한다. 쓰기에서 경계가 지켜지므로 읽기는 효율 우선.
+
+##### 옵션 B — Use-Case에서 여러 Query Service 조합
+
+각 Context에 자기 query service를 두고 use-case가 여러 개를 주입받아 메모리에서 조립.
+
+```
+infrastructure/organization/queries/employee.query-service.ts
+infrastructure/payroll/queries/payroll-summary.query-service.ts
+infrastructure/attendance/queries/attendance.query-service.ts
+
+use-cases/employee-dashboard/
+└── employee-dashboard.use-case.ts
+     ├─ employeeQuery.findDetail(id)
+     ├─ payrollQuery.findRecent(id)
+     └─ attendanceQuery.findThisMonth(id)
+    → 메모리에서 조립해 DashboardDto 반환
+```
+
+**적합**: Context별로 DB가 다를 가능성 / 읽기도 Context 경계를 유지하고 싶을 때 / 각 query가 다른 화면에서도 재사용될 때.
+
+**단점**: DB 조인보다 느릴 수 있음, N+1 위험.
+
+##### 선택 기준 요약
+
+| 조건 | 선택 |
+|---|---|
+| 단일 DB + 성능 우선 + 화면 전용 조회 | **A (통합 QS)** |
+| Context별 DB 가능성 / 읽기도 경계 유지 / QS 재사용성 | **B (use-case 조합)** |
+
+단일 DB가 기본이므로 **A를 기본값**으로 시작하고, Context 경계를 엄격히 지키고 싶을 때 B로 전환하는 식이 실용적.
+
+### Query Service ↔ 도메인 스냅샷 VO 혼동 주의
+
+다른 Context 정보가 필요한 두 상황이 있는데 **해결 방식이 층위에 따라 다르다**:
+
+| | 도메인 스냅샷 VO / 계약 (04 참조) | Query Service (지금 섹션) |
+|---|---|---|
+| 어디서 쓰나 | domain 레이어 내부 (쓰기 로직) | infrastructure (읽기 응답) |
+| 왜 필요 | 도메인 규칙의 순수성·무결성 | 화면 DTO 효율 제공 |
+| 언제 | 급여 계산·정책 적용 등 **쓰기 사이클** 중 외부 Context 정보 필요 | 대시보드·목록·리포트 등 **화면 조회** |
+| 반환 | VO (도메인 개념) | DTO (API 응답 모양) |
+
+정보가 **도메인 규칙 실행**에 필요하면 스냅샷 VO + 계약([`04-domain-layer.md`](04-domain-layer.md)), **화면 표시**에만 필요하면 Query Service (지금 섹션).
+
+### 레이어 건너뛰기 허용
+
+app이 use-cases·domain을 거치지 않고 infrastructure의 query service를 직접 참조하는 건 **레이어 단방향 의존을 깨지 않는다** — 위→아래 방향이니까. 이 스킬은 "바로 다음 레이어만 참조해야 한다"는 규칙을 두지 않는다. 중간 건너뛰기 OK.
+
+### 구현 구조 예
+
+```
+infrastructure/
+├── organization/
+│   ├── employee.typeorm.repository.ts         ← 쓰기 (domain 인터페이스 구현)
+│   ├── organization.typeorm.repository.ts
+│   └── queries/
+│       ├── employee.query-service.ts          ← 단일 Context 조회
+│       └── organization-tree.query-service.ts
+├── payroll/
+│   ├── payroll.typeorm.repository.ts
+│   └── queries/
+│       └── payroll-summary.query-service.ts
+└── queries/                                   ← 통합 조회 (옵션 A)
+    └── employee-dashboard.query-service.ts    ← 여러 Context 테이블 조인
+```
+
+작은 프로젝트라면 `infrastructure/queries/` 하나에 모두 모아도 된다.
+
+### Query Service 인터페이스 여부
+
+Query Service는 쓰기 리포지토리와 달리 **도메인 인터페이스 없이 직접 참조**하는 경우가 흔하다 — 화면 DTO가 API 응답 모양과 거의 같아 타입 분리 이득이 적고, 테스트도 가짜 구현체보다 **testcontainers + real DB**가 현실적.
+
+원하면 인터페이스를 씌울 수 있지만 **의무는 아니다**. 쓰기는 엄격히 DIP, 읽기는 실용적으로 — 이 비대칭도 CQRS의 특징.
+
+### 체크리스트
+
+- [ ] 리포지토리에 다른 Context 테이블과 조인하는 메서드가 있나? → Query Service로 분리.
+- [ ] 리포지토리에 화면 DTO 반환 메서드가 쌓이고 있나? → Query Service로 분리.
+- [ ] 읽기 엔드포인트가 domain을 불필요하게 경유하나? → Query Service 직접.
+- [ ] 다중 Context 조회를 옵션 A/B 중 어느 것으로 할지 결정했나?
+- [ ] 도메인 로직에서 필요한 외부 Context 정보를 Query Service로 가져와 쓰고 있지 않나? → 스냅샷 VO + 계약(04)으로 교체.
 
 ## 응답 에러 매핑
 

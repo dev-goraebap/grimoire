@@ -17,13 +17,19 @@ section: slices
 | `domain` | **Bounded Context** (다중 Context) 또는 **없음** (단일 Context) | 상황에 따라 — 아래 상세 |
 | `shared` | **기술 세그먼트** | `shared/logger`, `shared/db`, `shared/util` |
 
-## domain 레이어의 두 가지 모양
+## domain 레이어의 두 가지 방식
 
-`domain`은 시스템 규모에 따라 구조가 달라진다 — **FSD와 가장 크게 다른 지점**이며 이 스킬만의 의도적 유연성이다.
+`domain`은 시스템 규모에 따라 구조가 달라진다 — 이 스킬이 FSD와 가장 크게 다른 지점이며 의도적 유연성이다.
 
-### 시나리오 1: 단일 Context (작은 시스템)
+두 방식을 **Slice 방식**과 **Sliceless 방식**으로 부른다. 용어는 FSD 공식 정의를 따른다 — FSD는 `app`·`shared` 같은 레이어를 "sliceless layer"라 부르는데, 이 스킬은 `domain`도 작은 시스템에선 sliceless가 될 수 있다고 허용한다.
+
+> 팀 내부에서 이 두 방식을 각각 "슬라이스 방식 / 세그먼트 방식"으로 불러도 문제없다. 다만 FSD 엄밀 용어상 "segment"는 슬라이스 내부의 기술 분류(ui/model/api 같은 세로 썰기)를 가리켜 의미가 다르므로, 외부와 소통할 때는 slice / sliceless가 정확하다.
+
+### Sliceless 방식 (단일 Bounded Context)
 
 도메인 개념이 **하나의 용어 체계**로 충분한 경우. 같은 단어가 문맥별로 다른 의미로 쓰이지 않는다.
+
+가장 단순한 형태는 평평 구조:
 
 ```
 domain/
@@ -36,9 +42,24 @@ domain/
     └── employee-placement.policy.ts
 ```
 
-슬라이스 개념이 없다 — `domain` 전체가 하나의 Context. 엔티티·VO·리포지토리가 서로 자유롭게 참조한다. 이 경우 "같은 레이어 슬라이스 참조 금지"는 **적용 대상이 없다** (슬라이스 자체가 없으니).
+파일이 늘어나면 **의미적 그룹화**를 위해 개념별로 폴더를 묶어도 된다:
 
-### 시나리오 2: 다중 Context (중·대 시스템)
+```
+domain/
+├── employee/
+│   ├── employee.entity.ts
+│   ├── employee.repository.ts
+│   └── employee-status.vo.ts
+├── organization/
+│   ├── organization.entity.ts
+│   └── organization.repository.ts
+└── rank/
+    └── rank.vo.ts
+```
+
+중요: **이 폴더는 슬라이스가 아니다**. 같은 Context에 속하므로 `domain/employee/`가 `domain/organization/`을 자유롭게 참조할 수 있다. 슬라이스 경계를 나눈 게 아니라 단순히 응집도를 높이기 위한 **그룹화 폴더**다. "같은 레이어 슬라이스 참조 금지" 규칙은 **적용 대상이 없다** — 슬라이스 자체가 없기 때문.
+
+### Slice 방식 (다중 Bounded Context)
 
 같은 단어가 문맥별로 다른 모델이 될 때 (예: "직원"이 조직관리에선 `상관/직책` 중심, 급여에선 `급여계정/세금` 중심).
 
@@ -62,21 +83,30 @@ domain/
     └── index.ts
 ```
 
-각 Context 내부에서는 엔티티 자유 참조, Context 간은 금지.
+각 Context 내부에서는 엔티티 자유 참조, Context 간은 금지. **슬라이스 참조 규칙이 엄격히 적용**된다.
+
+Sliceless 방식의 `domain/employee/`와 Slice 방식의 `domain/organization/`은 **겉모양이 비슷해 혼동하기 쉽지만 성격이 다르다**:
+
+- Sliceless 그룹화 폴더 → 서로 자유 참조 (한 Context 내부의 편의 그룹화)
+- Slice 방식의 Context 폴더 → 서로 참조 금지 (Bounded Context 경계)
+
+이 차이는 프로젝트 시작 시 **명시적으로 결정하고 팀이 공유**해야 한다. 문서(README 또는 AGENTS.md)에 "이 프로젝트 domain은 Sliceless 방식 / Slice 방식" 한 줄을 적어두면 새 합류자·에이전트 모두 같은 전제를 쓴다.
 
 ### FSD와의 차이
 
-FSD(프론트엔드)는 `entities` 레이어에 **항상 엔티티별 슬라이스**를 강제한다 (`entities/user`, `entities/post`). 이 스킬의 `domain`은 그와 다르다:
+FSD(프론트엔드)는 `entities` 레이어에 **항상 엔티티별 슬라이스**를 강제한다. 이 스킬의 `domain`은 다르다:
 
-- **단일 Context면 슬라이스 개념을 아예 안 쓴다** — 과설계 방지.
-- **다중 Context로 커지면** 비로소 Context 단위 슬라이스를 도입.
+- **Sliceless 방식**이 기본 선택지로 허용된다 — 과설계 방지.
+- **Slice 방식으로 커지면** Bounded Context 단위로 슬라이스를 도입.
 
-이 유연성 덕에 작은 프로젝트는 보일러플레이트 없이 시작하고, 커지면 Context별로 분화해 대응한다. 단, **경계를 나눈 순간부터는 슬라이스 참조 규칙을 엄격히 적용한다** — 시나리오 1에서 2로 진화할 때 가장 큰 리팩터링은 "자유롭게 섞여 있던 참조를 Context 경계에 맞춰 정리하는 일".
+이 유연성 덕에 작은 프로젝트는 보일러플레이트 없이 시작하고, 커지면 Context별로 분화해 대응한다. 단, **경계를 나눈 순간부터는 슬라이스 참조 규칙을 엄격히 적용**한다. Sliceless에서 Slice로 진화할 때 가장 큰 리팩터링은 "자유롭게 섞여 있던 참조를 Context 경계에 맞춰 정리하는 일".
 
-### 세그먼트 분류는 안티패턴
+### 기술 유형별 분류는 안티패턴 (Sliceless와 다른 얘기)
+
+Sliceless 방식의 **의미적 그룹화**와 **기술 유형별 분류**는 다르다. 후자는 어느 방식에서든 안티패턴.
 
 ```
-# 지양
+# 지양 (기술 유형별 분류)
 domain/
 ├── models/
 ├── value-objects/
@@ -84,11 +114,13 @@ domain/
 └── services/
 ```
 
-이런 **기술적 유형별 분류**는 Employee 개념을 이해하려 세 폴더를 오가게 만든다. 한 Context의 엔티티·VO·리포지토리는 **같은 폴더**에 모여야 응집도가 생긴다. 시나리오 1이면 `domain/` 아래 평평하게, 시나리오 2면 Context별 폴더 안에 함께.
+이런 분류는 Employee 개념을 이해하려 네 폴더를 오가게 만든다. 응집도 파괴.
+
+허용되는 그룹화는 **의미 단위**(employee, organization 같은 도메인 개념)이고, 금지되는 것은 **기술 유형**(models, repositories, services). Sliceless 방식의 `domain/employee/`는 전자라 OK.
 
 ## 같은 레이어 슬라이스 간 참조: 금지
 
-슬라이스 개념이 있는 레이어(app / use-cases / 다중 Context domain)에서 적용.
+슬라이스 개념이 있는 레이어(app / use-cases / Slice 방식 domain)에서 적용.
 
 ```
 app/employees    ─X─▶ app/organizations   (금지, API 리소스끼리)
@@ -209,7 +241,7 @@ app/employees/
     └── owner.guard.ts        ← 슬라이스 전용
 ```
 
-### domain 슬라이스 예 (Context, 시나리오 2)
+### domain 슬라이스 예 (Slice 방식, Bounded Context 단위)
 
 ```
 domain/organization/
@@ -239,7 +271,8 @@ domain/organization/
 - [ ] 같은 레이어 슬라이스간 import 있는가? → DIP로 해결.
 - [ ] 슬라이스마다 `index.ts` barrel이 있는가?
 - [ ] 외부 슬라이스를 내부 파일 경로로 직접 import하고 있진 않은가? → barrel 경유로 교정.
-- [ ] domain이 시나리오 1(단일)인데 Context별 슬라이스로 쪼갰나? → 과설계, 평탄화.
-- [ ] domain이 시나리오 2(다중 Context)인데 엔티티들이 한 폴더에 섞여 있나? → 경계 정리.
+- [ ] domain이 Sliceless 방식(단일 Context)인데 Context별 슬라이스로 쪼갰나? → 과설계, 평탄화.
+- [ ] domain이 Slice 방식(다중 Context)인데 엔티티들이 한 폴더에 섞여 있나? → 경계 정리.
+- [ ] Sliceless 방식의 그룹화 폴더(`domain/employee/`)를 슬라이스로 오인해 참조를 막고 있진 않나? → 같은 Context 내부는 자유 참조.
 - [ ] 레이어 역방향 import 없는가? (`domain` → `app` 등)
 - [ ] `domain/models/`, `domain/repositories/` 같은 기술 유형별 분류로 빠졌나? → Context별 재구성.
