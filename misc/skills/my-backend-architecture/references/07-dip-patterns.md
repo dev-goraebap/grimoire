@@ -8,14 +8,34 @@ section: dip-patterns
 
 ## 시나리오
 
-전형적 예: `app/users`의 사용자 삭제 기능이 `app/posts`의 글 삭제 기능을 필요로 한다.
+### 시나리오 A — app 레이어 슬라이스 간 (API 리소스끼리)
+
+`app/employees`의 퇴사 처리 기능이 `app/payroll`의 급여 정지 기능을 필요로 한다.
 
 ```
-app/users/users.service.ts
-  └─ 사용자 삭제 시 → app/posts/posts.service.ts 의 removeAllByUser() 를 호출하고 싶음
+app/employees/employees.service.ts
+  └─ 퇴사 처리 시 → app/payroll/payroll.service.ts 의 stopPayroll() 호출하고 싶음
 ```
 
-[`02-slices.md`](02-slices.md) 규칙상 같은 레이어 참조는 금지. 해결책 두 가지.
+[`02-slices.md`](02-slices.md) 규칙상 같은 레이어 참조는 금지. 해결책 두 가지 (아래 A안/B안).
+
+### 시나리오 B — domain Bounded Context 간
+
+다중 Context 시나리오(2)에서 `domain/payroll`이 `domain/organization`의 Employee 정보를 필요로 한다.
+
+```
+domain/payroll/payroll.service.ts
+  └─ 급여 계산 시 → domain/organization 의 Employee 를 참조하고 싶음 (금지)
+```
+
+이 경우 아래 A/B에 더해 **Context 특유의 네 가지 기법**이 기본 옵션으로 제공된다:
+
+- **ID만 소유** — `employeeId: string`만 저장.
+- **스냅샷 VO** — `PayableEmployee` 같은 VO로 필요한 필드만 자기 Context에 복제. 갱신은 이벤트 구독.
+- **Anti-corruption 계약** — `EmployeeLookup` 인터페이스를 payroll 안에 정의, 구현체는 infrastructure에서 organization 참조.
+- **도메인 이벤트 구독** — `EmployeeTerminated` 발행 → payroll이 구독.
+
+자세한 Context 협력 패턴은 [`04-domain-layer.md`](04-domain-layer.md)의 "Context 간 협력". 아래 A/B는 **직접 호출이 꼭 필요한 상황**에 적용.
 
 ## A안: 상위 레이어로 승격
 
@@ -25,11 +45,11 @@ app/users/users.service.ts
 
 ```
 use-cases/
-└── remove-user-with-posts/
-    └── remove-user-with-posts.use-case.ts      ← orchestrator
+└── offboard-employee/
+    └── offboard-employee.use-case.ts   ← orchestrator
 
-app/users/users.service.ts ──▶ use-cases/remove-user-with-posts
-app/posts/posts.service.ts는 자기 도메인 제거만 담당
+app/employees/employees.service.ts ──▶ use-cases/offboard-employee
+app/payroll/payroll.service.ts는 자기 도메인 처리만 담당
 ```
 
 ### 장단
@@ -57,19 +77,20 @@ app/posts/posts.service.ts는 자기 도메인 제거만 담당
 ### 구조
 
 ```
-app/posts/
-├── posts.service.ts             (PostsService — 원래 구현체)
-└── post-remover.contract.ts     (export interface PostRemover)
+app/payroll/
+├── index.ts                       (barrel — PAYROLL_STOPPER 토큰, PayrollStopper 인터페이스 export)
+├── payroll.service.ts             (PayrollService — 원래 구현체)
+└── payroll-stopper.contract.ts    (export interface PayrollStopper)
 
-app/users/users.service.ts ──▶ PostRemover (인터페이스)
-                                  │
-                                  └─ 런타임에 PostsService를 주입받음 (DI)
+app/employees/employees.service.ts ──▶ PayrollStopper (인터페이스)
+                                         │
+                                         └─ 런타임에 PayrollService를 주입 (DI)
 ```
 
 ### 런타임 구성 (NestJS 기준)
 
-- `app/posts/posts.module.ts`: `{ provide: POST_REMOVER, useClass: PostsService }` + exports에 `POST_REMOVER` 포함.
-- `app/users/users.module.ts`: `imports: [PostsModule]`, 서비스에서 `@Inject(POST_REMOVER)` 주입.
+- `app/payroll/payroll.module.ts`: `{ provide: PAYROLL_STOPPER, useClass: PayrollService }` + exports에 `PAYROLL_STOPPER` 포함.
+- `app/employees/employees.module.ts`: `imports: [PayrollModule]`, 서비스에서 `@Inject(PAYROLL_STOPPER)` 주입.
 
 **주의**: 모듈 파일에 `PostsModule` import가 남는다. 엄격한 import 경계로 보면 "같은 레이어 참조"가 **여전히 존재**. 이 문제와 해법은 [`09-framework-notes.md`](09-framework-notes.md).
 

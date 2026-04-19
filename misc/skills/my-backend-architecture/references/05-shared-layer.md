@@ -95,15 +95,15 @@ shared/
 
 ## shared vs infrastructure
 
-프로젝트에 따라 `infrastructure/` 레이어를 따로 두는 경우가 있다.
+이 스킬은 **`infrastructure/` 레이어를 기본 권장**한다 ([`01-layers.md`](01-layers.md)의 사용자 정의 레이어 섹션). 둘의 역할 분리:
 
-| | shared | infrastructure (선택) |
+| | shared | infrastructure |
 |---|---|---|
-| 담는 것 | 기술 인프라 **일반** (logger, util) | 도메인 리포지토리 **구현체**, 외부 API 어댑터 |
-| 도메인 인터페이스 구현? | 경우에 따라 | 주요 역할 |
-| 필수성 | 항상 필요 | 선택 (없으면 shared/db·shared/external-api로 대체) |
+| 담는 것 | 기술 인프라 **일반** (logger, util, 베이스 리포지토리) | 도메인 리포지토리 **구현체**, 외부 API 어댑터 |
+| 도메인 이름이 파일명에 등장? | **절대 안 됨** | 정상 (`infrastructure/users/user.typeorm.repository.ts`) |
+| 필수성 | 항상 필요 | 기본 권장 (작은 프로젝트에서도 가볍게 시작) |
 
-소·중 규모는 shared로 통합, 대규모는 infrastructure로 분리하는 경향.
+**왜 shared에 구현체를 두지 않나**: `shared`는 "도메인 의미 없는 기술 세그먼트" 원칙이다. `shared/db/users.typeorm.repository.ts`처럼 도메인 이름이 파일명에 들어가는 순간 원칙 위반 — `infrastructure`가 그 자리.
 
 ## 체크리스트
 

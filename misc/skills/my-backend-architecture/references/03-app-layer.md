@@ -28,10 +28,13 @@ REST라면 리소스 경로와 `app/` 하위 폴더를 **1:1**로 유지한다.
 
 | HTTP | 경로 | 파일 |
 |---|---|---|
-| GET | `/users` | `app/users/users.controller.ts` |
-| POST | `/users` | 같은 파일 |
-| GET | `/users/:id` | 같은 파일 |
-| POST | `/posts/:id/comments` | 리소스 설계에 따라 `app/posts/` 또는 `app/comments/` |
+| GET | `/employees` | `app/employees/employees.controller.ts` |
+| POST | `/employees` | 같은 파일 |
+| GET | `/employees/:id` | 같은 파일 |
+| GET | `/organizations/:id/members` | 리소스 설계에 따라 `app/organizations/` 또는 `app/employees/` |
+| POST | `/payroll/calculate` | `app/payroll/payroll.controller.ts` |
+
+**중요**: app 슬라이스는 API 리소스 단위로 **세분**되지만, 도메인 슬라이스는 Bounded Context 단위로 **통합**된다 (시나리오 2). 즉 `app/employees` · `app/organizations` · `app/payroll`이 각자 존재하면서 모두 `domain/organization`(또는 적절한 Context 슬라이스)을 참조할 수 있다. 이 비대칭은 정상이며, 외부 API 세분화가 내부 도메인 경계와 1:1로 맞아야 할 필요는 없다. 자세한 원리는 [`02-slices.md`](02-slices.md)의 "슬라이스 단위는 레이어마다 다르다".
 
 ### 자원 설계 가이드
 
@@ -105,13 +108,15 @@ app/users/
 - [`07-dip-patterns.md`](07-dip-patterns.md) — A안(use-cases 승격) / B안(계약 분리)
 - [`09-framework-notes.md`](09-framework-notes.md) — NestJS 모듈 시스템에서 정적 강제 방법
 
-## 전형적 흐름 (NestJS 기준)
+## 전형적 흐름 (NestJS 기준, HR 예)
 
-개요 (실제 코드는 프로젝트에서):
+`POST /employees` 엔드포인트 개요:
 
-- **Controller**: `@Body() dto` 받아 `service.create(dto)` 호출 → 결과를 ResponseDto로 변환해 반환.
-- **Service**: 트랜잭션 블록 안에서 `userRepository.create(dto)` → `mailerService.sendWelcome(user.email)` 순서 실행. 실패 시 롤백.
-- **도메인 호출은 전부 리포지토리 인터페이스 / 도메인 엔티티 메서드**만 사용. ORM 구체 타입은 app 서비스에 등장하지 않음.
+- **Controller** (`app/employees/employees.controller.ts`): `@Body() CreateEmployeeDto`를 받아 `employeesService.create(dto)` 호출 → 결과를 `EmployeeResponseDto`로 변환.
+- **Service** (`app/employees/employees.service.ts`): domain의 리포지토리 인터페이스(`EmployeeRepository`)와 도메인 서비스를 주입받아 오케스트레이션. 트랜잭션 블록에서 `employee = await employeeRepository.create(...)` → 도메인 이벤트 발행 → 환영 이메일(Notification) 발송.
+- **도메인 호출은 전부 리포지토리 인터페이스 / 도메인 엔티티 메서드**만 사용. ORM 구체 타입(`TypeOrmRepository<Employee>`)은 app 서비스에 등장하지 않음 — infrastructure가 감싼다.
+
+시나리오 2(다중 Context)에서 여러 Context를 엮는 경우 — 예: `onboardEmployee` 유스케이스가 `domain/organization` + `domain/payroll`을 모두 참조 — app 서비스가 커지면 `use-cases/onboard-employee`로 승격 ([`07-dip-patterns.md`](07-dip-patterns.md) A안).
 
 ## 응답 에러 매핑
 

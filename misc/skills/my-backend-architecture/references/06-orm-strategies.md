@@ -74,14 +74,14 @@ export class User {
 
 ### 구성
 
-- **스키마**는 `shared/db/schema/` 또는 `infrastructure/db/schema/`에.
+- **스키마**는 `infrastructure/db/schema/`에 (도메인 이름이 묻는 파일이라 `shared` 부적합).
 - **도메인 모델**(POJO 또는 클래스)은 `domain/users/user.ts`.
 - **리포지토리**가 스키마 ↔ 도메인 모델 매핑 책임.
 
 ### 예시 개요
 
 ```
-// shared/db/schema/users.ts
+// infrastructure/db/schema/users.ts
 export const usersTable = pgTable('users', {
   id: uuid('id').primaryKey(),
   email: text('email').notNull(),
@@ -100,7 +100,7 @@ export class User {
   canLogin(): boolean { return this.status === 'ACTIVE'; }
 }
 
-// shared/db/users.drizzle.repository.ts
+// infrastructure/users/user.drizzle.repository.ts
 export class DrizzleUserRepository implements UserRepository {
   async findById(id: string): Promise<User | null> {
     const rows = await db.select().from(usersTable).where(eq(usersTable.id, id)).limit(1);
@@ -188,8 +188,9 @@ export interface UserRepository {
 
 ### 구현체 위치
 
-- **간단한 프로젝트**: `shared/db/`에 구현체 + DI 바인딩.
-- **큰 프로젝트**: 별도 `infrastructure/users/user.typeorm.repository.ts`로 분리.
+구현체는 항상 **`infrastructure/<context>/` 레이어**에 둔다 — 도메인 이름(`users`, `employee`, `order`)이 파일명에 들어가는 순간 `shared` 원칙("도메인 무관 기술 세그먼트")과 충돌한다. `shared/db/`에는 **도메인 무관 베이스**(`BaseTypeOrmRepository`, `TransactionManager`, DB 연결 팩토리)만 둔다.
+
+작은 프로젝트에서도 infrastructure는 가볍게 시작 가능 — 파일 몇 개로 족하다. 규모가 커지면 Context별 서브폴더(`infrastructure/organization/`, `infrastructure/payroll/`)로 분화.
 
 ### 왜 인터페이스 분리?
 
@@ -200,7 +201,7 @@ export interface UserRepository {
 ### NestJS에서 주입
 
 - 도메인이 인터페이스 토큰을 export (`USER_REPOSITORY`).
-- DB 모듈(`shared/db` 또는 infrastructure)이 `{ provide: USER_REPOSITORY, useClass: DrizzleUserRepository }`로 바인딩.
+- infrastructure 모듈이 `{ provide: USER_REPOSITORY, useClass: DrizzleUserRepository }`로 바인딩. bootstrap 레이어에서 이를 조립 ([`09-framework-notes.md`](09-framework-notes.md)).
 - 상위 서비스는 `@Inject(USER_REPOSITORY)`로 주입받아 사용.
 
 ## 언제 어떤 ORM을 쓸까

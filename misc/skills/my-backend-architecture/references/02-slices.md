@@ -4,20 +4,102 @@ section: slices
 
 # Slices
 
-레이어 내 **기능 단위 폴더**를 슬라이스라 부른다 (FSD 용어 차용). 예: `app/users`, `app/posts`, `domain/users`, `shared/logger`.
+레이어 내 **단위 폴더**를 슬라이스라 부른다 (FSD 용어 차용).
+
+## 슬라이스의 단위는 레이어마다 다르다 (중요)
+
+같은 "슬라이스"라는 용어를 쓰지만 레이어마다 무엇을 한 단위로 묶는지 다르다.
+
+| 레이어 | 슬라이스 단위 | 예 |
+|---|---|---|
+| `app` | **API 리소스** (세분) | `app/employees`, `app/organizations`, `app/payroll` |
+| `use-cases` / `features` | **유스케이스** 또는 공통 관심사 | `use-cases/onboard-employee` |
+| `domain` | **Bounded Context** (다중 Context) 또는 **없음** (단일 Context) | 상황에 따라 — 아래 상세 |
+| `shared` | **기술 세그먼트** | `shared/logger`, `shared/db`, `shared/util` |
+
+## domain 레이어의 두 가지 모양
+
+`domain`은 시스템 규모에 따라 구조가 달라진다 — **FSD와 가장 크게 다른 지점**이며 이 스킬만의 의도적 유연성이다.
+
+### 시나리오 1: 단일 Context (작은 시스템)
+
+도메인 개념이 **하나의 용어 체계**로 충분한 경우. 같은 단어가 문맥별로 다른 의미로 쓰이지 않는다.
+
+```
+domain/
+├── employee.entity.ts
+├── organization.entity.ts
+├── rank.vo.ts
+├── employee.repository.ts       (interface)
+├── organization.repository.ts
+└── policies/
+    └── employee-placement.policy.ts
+```
+
+슬라이스 개념이 없다 — `domain` 전체가 하나의 Context. 엔티티·VO·리포지토리가 서로 자유롭게 참조한다. 이 경우 "같은 레이어 슬라이스 참조 금지"는 **적용 대상이 없다** (슬라이스 자체가 없으니).
+
+### 시나리오 2: 다중 Context (중·대 시스템)
+
+같은 단어가 문맥별로 다른 모델이 될 때 (예: "직원"이 조직관리에선 `상관/직책` 중심, 급여에선 `급여계정/세금` 중심).
+
+```
+domain/
+├── organization/                ← 조직관리 Context (슬라이스)
+│   ├── employee.entity.ts
+│   ├── organization.entity.ts
+│   ├── position.entity.ts
+│   ├── employee.repository.ts
+│   └── index.ts                 ← public API
+├── attendance/                  ← 근태 Context (슬라이스)
+│   ├── attendance.entity.ts
+│   ├── shift.entity.ts
+│   ├── employee-snapshot.vo.ts  (근태 맥락의 직원 — ID + 부서명 정도만)
+│   └── index.ts
+└── payroll/                     ← 급여 Context (슬라이스)
+    ├── payroll.entity.ts
+    ├── salary.vo.ts
+    ├── payable-employee.vo.ts   (급여 계산에 필요한 정보만)
+    └── index.ts
+```
+
+각 Context 내부에서는 엔티티 자유 참조, Context 간은 금지.
+
+### FSD와의 차이
+
+FSD(프론트엔드)는 `entities` 레이어에 **항상 엔티티별 슬라이스**를 강제한다 (`entities/user`, `entities/post`). 이 스킬의 `domain`은 그와 다르다:
+
+- **단일 Context면 슬라이스 개념을 아예 안 쓴다** — 과설계 방지.
+- **다중 Context로 커지면** 비로소 Context 단위 슬라이스를 도입.
+
+이 유연성 덕에 작은 프로젝트는 보일러플레이트 없이 시작하고, 커지면 Context별로 분화해 대응한다. 단, **경계를 나눈 순간부터는 슬라이스 참조 규칙을 엄격히 적용한다** — 시나리오 1에서 2로 진화할 때 가장 큰 리팩터링은 "자유롭게 섞여 있던 참조를 Context 경계에 맞춰 정리하는 일".
+
+### 세그먼트 분류는 안티패턴
+
+```
+# 지양
+domain/
+├── models/
+├── value-objects/
+├── repositories/
+└── services/
+```
+
+이런 **기술적 유형별 분류**는 Employee 개념을 이해하려 세 폴더를 오가게 만든다. 한 Context의 엔티티·VO·리포지토리는 **같은 폴더**에 모여야 응집도가 생긴다. 시나리오 1이면 `domain/` 아래 평평하게, 시나리오 2면 Context별 폴더 안에 함께.
 
 ## 같은 레이어 슬라이스 간 참조: 금지
 
+슬라이스 개념이 있는 레이어(app / use-cases / 다중 Context domain)에서 적용.
+
 ```
-app/users       ─X─▶ app/posts        (금지)
-domain/orders   ─X─▶ domain/payments  (금지)
-use-cases/a     ─X─▶ use-cases/b      (금지)
+app/employees    ─X─▶ app/organizations   (금지, API 리소스끼리)
+domain/organization ─X─▶ domain/payroll   (금지, Bounded Context끼리)
+use-cases/a      ─X─▶ use-cases/b          (금지)
 ```
 
-### 왜?
+### 왜 금지인가
 
 - 같은 레이어 슬라이스끼리 의존이 생기면 **의존 그래프가 평면 네트워크**가 되어, 어떤 슬라이스를 수정할 때 영향 범위 예측이 어려워진다.
-- 테스트·이해·리팩터링의 단위가 "슬라이스 하나"로 유지되어야 레이어 구조가 실질적 가치를 만든다. 네트워크로 엮이기 시작하면 레이어가 시각적 폴더에 불과해진다.
+- 테스트·이해·리팩터링 단위가 "슬라이스 하나"로 유지되어야 레이어 구조의 가치가 살아난다. 네트워크로 엮이기 시작하면 레이어가 시각적 폴더에 불과해진다.
 - 이 규칙이 깨지기 시작하면 다른 규칙(레이어 단방향 등)도 **연쇄적으로 뚫린다**. 첫 위반이 가장 비싸다.
 
 ### 어떻게 피하나
@@ -27,20 +109,20 @@ use-cases/a     ─X─▶ use-cases/b      (금지)
 - **A안**: 공통 기능을 상위 레이어(`use-cases` / `features`)로 승격.
 - **B안**: 계약 인터페이스를 만들고 원래 자리는 구현체로. 다른 슬라이스는 계약만 참조.
 
-선택 기준은 [`07-dip-patterns.md`](07-dip-patterns.md).
+도메인 Context 간 참조가 필요할 때도 같은 기법 + ID만 소유·이벤트 구독이 표준. 선택 기준은 [`07-dip-patterns.md`](07-dip-patterns.md).
 
 ### 단순 중복은 허용
 
-코드 중복이 약간 있다고 해서 매번 A/B 기법을 꺼낼 필요는 없다. "중복 제거 vs 슬라이스 독립성" 사이 **트레이드오프**. 재사용 빈도가 낮고 기능이 단순하면 복사가 더 저렴하다. DIP는 재사용 횟수가 정말 늘어난 뒤 적용.
+코드 중복이 약간 있다고 해서 매번 A/B 기법을 꺼낼 필요는 없다. "중복 제거 vs 슬라이스 독립성" **트레이드오프**. 재사용 빈도가 낮고 기능이 단순하면 복사가 저렴하다. DIP는 재사용 횟수가 정말 늘어난 뒤 적용 — **3번째 재사용**이 보일 때가 경험적 기준.
 
 ## shared 예외
 
 `shared`는 위 규칙의 예외. **슬라이스 간 상호 참조 허용**. 단, 양방향 순환은 피한다.
 
 ```
-shared/logger  ──▶ shared/config   (OK)
-shared/db      ──▶ shared/logger   (OK)
-shared/config  ──▶ shared/logger   (OK)
+shared/logger  ──▶ shared/config    (OK, logger가 로그 레벨 읽음)
+shared/db      ──▶ shared/logger    (OK, DB 쿼리 로그)
+shared/config  ──▶ shared/logger    (OK)
 
 shared/a ──▶ shared/b ──▶ shared/a  (순환 금지)
 ```
@@ -51,54 +133,113 @@ shared/a ──▶ shared/b ──▶ shared/a  (순환 금지)
 
 순환(`a → b → a`)만 피하면 된다. 순환이 나타났다는 건 한쪽을 더 작게 쪼개거나 한쪽을 다른 쪽으로 흡수해야 한다는 신호.
 
-## 정적 감지 수단
+## Public API 참조 규칙 (barrel export)
+
+슬라이스 **내부는 자유로이 구성**하되, **외부에서 참조할 수 있는 것은 명시적으로 공개된 것**만이다. TypeScript 환경에서는 **barrel file(`index.ts`)**로 구현한다.
+
+```ts
+// domain/organization/index.ts  (public API)
+export { Employee } from './employee.entity';
+export { Organization } from './organization.entity';
+export type { EmployeeRepository } from './employee.repository';
+export { EMPLOYEE_REPOSITORY } from './tokens';
+// 정책 내부 함수, 보조 VO, 구현 세부는 export 안 함
+```
+
+```ts
+// 외부 슬라이스·레이어에서
+import { Employee, EmployeeRepository } from '@domain/organization';   // OK
+
+// 금지 — 내부 세부 직접 접근
+import { Employee } from '@domain/organization/employee.entity';       // ❌
+import { calculatePayGrade } from '@domain/organization/policies/pay-grade.policy';   // ❌
+```
+
+### 왜 필요한가
+
+- **슬라이스 내부 리팩터링 자유 확보** — 파일 이동·이름 변경이 외부에 영향 없음.
+- **"무엇이 공식 계약인지" 명확화** — barrel에 없으면 private.
+- **슬라이스 경계가 "의도적 API"로 표현**됨 — 우연히 공개된 것과 의도적 공개가 구분.
+
+### 내부 참조는 자유
+
+같은 슬라이스 **내부 파일끼리 import**는 barrel을 거치지 않는다 — 내부 자유 구성 원칙. barrel 필수는 **슬라이스 외부에서 들어올 때만**.
+
+```ts
+// 같은 슬라이스 내부 — OK
+// domain/organization/organization.entity.ts
+import { Employee } from './employee.entity';   // 내부 참조는 직접 OK
+```
+
+### 정적 강제
+
+barrel 규약은 관례만으론 깨지기 쉽다. [`09-framework-notes.md`](09-framework-notes.md)의 경계 강제 수단들이 이 규약도 함께 지켜준다:
+
+- `eslint-plugin-boundaries` — "외부 슬라이스는 `index.ts`만 import" 규칙.
+- `dependency-cruiser` — 경로 패턴 위반 감지 (`allowOnlyDefinedIn`).
+- TypeScript `paths` alias — `@domain/organization/*` 대신 `@domain/organization`만 허용.
+
+## 정적 감지 수단 요약
 
 규칙을 개발자 규율에만 맡기면 결국 깨진다. 정적으로 강제하는 도구들:
 
-- **`eslint-plugin-boundaries`** — ESLint 규칙으로 "app 슬라이스가 다른 app 슬라이스를 import하면 에러" 선언. IDE·PR 모두에서 즉시 피드백.
-- **`dependency-cruiser`** — 독립 CLI. 의존 그래프 시각화 + 위반 리포트. CI에서 주기적 감사.
-- **Nx monorepo의 `enforce-module-boundaries`** — 태그 기반 강제 (Nx 생태계 전제). 가장 강력하지만 러닝 커브 있음.
-- **TypeScript path alias (`tsconfig paths`)** — `@app/*`, `@domain/*` 등으로 import 경로 제한. 우회가 쉬워 얕은 방어선이지만 같이 쓰면 유용.
+- **`eslint-plugin-boundaries`** — 파일 단위 role 선언 + 허용 관계, IDE·PR 즉시 피드백.
+- **`dependency-cruiser`** — 독립 CLI, 의존 그래프 시각화 + 위반 리포트, CI 감사.
+- **Nx monorepo `enforce-module-boundaries`** — 태그 기반, Nx 전제.
+- **TypeScript path alias (`tsconfig paths`)** — import 경로 정돈, 보조 방어선.
 
 구체 설정·선택 기준은 [`09-framework-notes.md`](09-framework-notes.md).
 
 ## 슬라이스 내부 구조
 
-슬라이스 안은 자유롭게 구성. NestJS 기준 예:
+슬라이스 안은 **자유롭게 구성**한다. 다만 외부 공개는 `index.ts` barrel을 거친다.
+
+### app 슬라이스 예 (NestJS)
 
 ```
-app/users/
-├── users.module.ts
-├── users.controller.ts
-├── users.service.ts
+app/employees/
+├── index.ts                  ← public: EmployeesModule만
+├── employees.module.ts
+├── employees.controller.ts
+├── employees.service.ts
 ├── dto/
-│   ├── create-user.dto.ts
-│   └── update-user.dto.ts
+│   ├── create-employee.dto.ts
+│   └── update-employee.dto.ts
 └── guards/
-    └── owner.guard.ts         ← 이 슬라이스 전용
+    └── owner.guard.ts        ← 슬라이스 전용
 ```
 
+### domain 슬라이스 예 (Context, 시나리오 2)
+
 ```
-domain/users/
-├── user.entity.ts
-├── user-status.vo.ts
-├── user.repository.ts         (interface)
-├── user.policies.ts           (도메인 정책 순수 함수)
+domain/organization/
+├── index.ts                  ← public: Employee, Organization, repository interfaces, tokens
+├── employee.entity.ts
+├── organization.entity.ts
+├── position.entity.ts
+├── rank.vo.ts
+├── employee.repository.ts    (interface)
+├── tokens.ts                 (EMPLOYEE_REPOSITORY 등 DI 토큰)
+├── policies/
+│   ├── employee-placement.policy.ts
+│   └── promotion.policy.ts
 └── events/
-    └── user-registered.event.ts
+    ├── employee-hired.event.ts
+    └── position-assigned.event.ts
 ```
 
 원칙:
 
-- **슬라이스 내부에서만 쓰는** guards/pipes/helpers는 슬라이스 안에 유지.
+- **슬라이스 내부에서만 쓰이는** guards/pipes/helpers는 슬라이스 안에 유지 + barrel에서 export 안 함.
 - **공통 guards/pipes**는 `shared`로 승격.
-- 내부 파일 개수가 많아져 거슬리기 시작하면 **슬라이스 쪼개기** 신호 (`domain/users` → `domain/users` + `domain/user-authentication`).
+- 내부 파일 개수가 많아져 거슬리기 시작하면 **슬라이스 쪼개기** 신호 (`domain/organization` → `domain/organization` + `domain/role-management`).
 
 ## 체크리스트
 
-슬라이스 경계를 판단할 때 쓰는 빠른 질문들:
-
-- [ ] 이 import가 같은 레이어의 다른 슬라이스를 가리키나? → 금지, DIP 필요.
-- [ ] 이 import가 아래 레이어를 건너뛰고 더 아래를 가리키나? (예: `app` → `shared`를 건너뛰고...) → 가능하지만 중간 레이어가 정말 필요 없는지 검토.
-- [ ] 이 import가 위 레이어를 가리키나? → 역방향. 금지.
-- [ ] 이 파일이 슬라이스 내부 전용인데 밖에서 쓰이고 있나? → 슬라이스의 public API를 명확히(barrel `index.ts`) 설계.
+- [ ] 같은 레이어 슬라이스간 import 있는가? → DIP로 해결.
+- [ ] 슬라이스마다 `index.ts` barrel이 있는가?
+- [ ] 외부 슬라이스를 내부 파일 경로로 직접 import하고 있진 않은가? → barrel 경유로 교정.
+- [ ] domain이 시나리오 1(단일)인데 Context별 슬라이스로 쪼갰나? → 과설계, 평탄화.
+- [ ] domain이 시나리오 2(다중 Context)인데 엔티티들이 한 폴더에 섞여 있나? → 경계 정리.
+- [ ] 레이어 역방향 import 없는가? (`domain` → `app` 등)
+- [ ] `domain/models/`, `domain/repositories/` 같은 기술 유형별 분류로 빠졌나? → Context별 재구성.
