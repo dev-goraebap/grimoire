@@ -157,7 +157,7 @@ infrastructure/
 
 ## 확장 예시 (디렉토리 트리)
 
-### 시나리오 1 — 단일 Context (작은 시스템)
+### Sliceless 방식 예 — 단일 Bounded Context (작은 시스템)
 
 HR CRUD 수준. domain이 평평하게.
 
@@ -192,7 +192,7 @@ src/
     └── util/
 ```
 
-### 시나리오 2 — 다중 Bounded Context (중·대 시스템)
+### Slice 방식 예 — 다중 Bounded Context (중·대 시스템)
 
 HR이 조직관리·근태·급여로 분화한 단계. domain이 Context별 슬라이스로.
 

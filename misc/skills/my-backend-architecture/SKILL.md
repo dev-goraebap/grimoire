@@ -69,12 +69,6 @@ app ──▶ (use-cases | features)? ──▶ domain ──▶ shared
 | "도메인 레이어 테스트 범위" | `08` + `04` |
 | "shared에서 도메인 개념 필요" | `05` + `07` |
 
-## 관련 스킬
-
-- **`blueprints:domain-model`** — 이 스킬이 **코드 구조**라면, domain-model은 **도메인 문서**(Role / Ubiquitous Language / Invariants). 용어·불변 규칙의 정규 출처. 이 스킬의 `04-domain-layer`·`07-dip-patterns`에서 cross-ref.
-- **`misc:fsd-docs`** — 프론트엔드 Feature-Sliced Design v2.1 공식 문서. 이 스킬은 그 영감을 받은 **백엔드 대응물**.
-- **`engineering:testing-strategy`** — 일반적 테스트 전략. `08-testing.md`는 그 위에 "도메인 정책 우선, 통합은 선택" 관점을 얹는다.
-
 ## 원칙
 
 - **완벽한 클린 아키텍처 지향 아님**. 도메인이 `shared`를 참조하는 건 허용. 이유는 `00-overview.md`의 "Not Clean Architecture".
