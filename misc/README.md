@@ -16,7 +16,7 @@
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup --skill docs-to-md --skill fsd-docs
+npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup --skill docs-to-md --skill fsd-docs --skill my-backend-architecture
 ```
 
 > 기획·설계 문서 스킬(`lean-prd`, `erd`, `domain-model`, `policy-book`)은 `blueprints` 플러그인으로 이동했습니다. [blueprints/README.md](../blueprints/README.md) 참조.
@@ -120,6 +120,39 @@ FSD에서 cross-import는 어떻게 처리해?
 **라이선스:** 원문은 MIT (© 2018-2026 Feature-Sliced Design core-team). [`LICENSE.md`](skills/fsd-docs/LICENSE.md)에 전문 포함.
 
 자세한 인덱스는 [SKILL.md](skills/fsd-docs/SKILL.md) 참조.
+
+---
+
+### `my-backend-architecture` (v0.1)
+
+**개인 선호 백엔드 아키텍처 지식 스킬.** FSD에서 영감을 받아 백엔드용으로 조정한 3-레이어(`app` / `domain` / `shared`) 구조 + 선택적 상위 레이어(`use-cases` / `features`), 슬라이스 참조 규칙(같은 레이어 금지 · shared 예외), ORM별 도메인 모델 전략, DIP 해결 기법, 테스트 철학을 성문화합니다. SKILL.md는 라우팅 테이블 역할만 하고 실제 내용은 10개 references로 분할되어 필요할 때만 로드됩니다 (Progressive Disclosure).
+
+**사용 예:**
+
+```
+백엔드 폴더 구조 app/domain/shared로 나누는 게 맞나?
+NestJS에서 app/users가 app/posts를 import하고 싶은데 어떻게?
+Drizzle 쓰는데 도메인 모델을 엔티티에 둘지 따로 둘지?
+NestJS 모듈 imports가 슬라이스 경계를 뚫어. 어떻게 정적으로 막지?
+도메인 레이어 테스트 범위가 뭐야?
+```
+
+**포함 섹션:**
+
+- `00-overview.md` — 철학·스코프·"Not Clean Architecture" 타협 지점·관련 스킬
+- `01-layers.md` — 4개 레이어 책임·의존 방향·확장 예시
+- `02-slices.md` — 슬라이스 참조 규칙·shared 예외·정적 감지 수단
+- `03-app-layer.md` — API 경로 ↔ 폴더 대응·컨트롤러/서비스 역할
+- `04-domain-layer.md` — 비즈니스 규칙 위치·DOMAIN.md와의 관계·리포지토리 인터페이스
+- `05-shared-layer.md` — 기술 세그먼트·양방향 참조 허용 범위·역참조 회피
+- `06-orm-strategies.md` — TypeORM Rich Entity / Drizzle·Prisma 분리형 / 트레이드오프 표
+- `07-dip-patterns.md` — A안(상위 레이어 승격) / B안(계약 분리) 동등 소개·shared→domain 역참조 회피
+- `08-testing.md` — 단위 우선·도메인 정책만 필수·프레임워크 독립 선호
+- `09-framework-notes.md` ⭐ — DI 설정 응집형(Spring Boot·.NET) vs 개발자 명시형(NestJS) 축·NestJS 경계 강제 6가지 수단(eslint-plugin-boundaries, dependency-cruiser, Nx boundaries, `@nestjs/cqrs`, 동적 모듈 bootstrapping, tsconfig paths)·규모별 권장 조합
+
+**관련 스킬:** `blueprints:domain-model` (도메인 문서 — 용어·불변 규칙의 정규 출처), `misc:fsd-docs` (프론트 대응물)
+
+자세한 라우팅은 [SKILL.md](skills/my-backend-architecture/SKILL.md) 참조.
 
 ## 주의
 

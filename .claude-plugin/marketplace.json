@@ -14,8 +14,8 @@
     {
       "name": "misc",
       "source": "./misc/",
-      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack).",
-      "version": "0.7.0"
+      "description": "Miscellaneous personal skills: pdf-parser, claude-hook-notify-setup, docs-to-md (fetch tech docs as local Markdown), fsd-docs (Feature-Sliced Design v2.1 knowledge pack), my-backend-architecture (Progressive-Disclosure knowledge skill for a personal FSD-inspired backend architecture with NestJS-centric examples; covers layer dependency rules, slice boundaries, ORM strategies for TypeORM/Drizzle/Prisma, DIP patterns, and static module-boundary enforcement tooling).",
+      "version": "0.8.0"
     },
     {
       "name": "blueprints",
