@@ -1,6 +1,6 @@
 # blueprints
 
-구현을 돕는 기획·설계 문서 스킬 4종. 각 스킬이 만드는 문서는 생성 후에도 프로젝트와 함께 수정·확장되는 것을 전제로 설계되어 있습니다 (그래서 스킬 이름에 `make-` 접두사가 없습니다).
+구현을 돕는 기획·설계 문서 스킬 3종. 각 스킬이 만드는 문서는 생성 후에도 프로젝트와 함께 수정·확장되는 것을 전제로 설계되어 있습니다 (그래서 스킬 이름에 `make-` 접두사가 없습니다).
 
 ## 어떤 스킬을 언제 쓰나
 
@@ -8,27 +8,14 @@
 |---|---|---|
 | [`lean-prd`](skills/lean-prd/SKILL.md) | 프로젝트 시작 시점, 비전·범위 정리 | 한 장짜리 PRD (`docs/lean-prd.md`) |
 | [`erd`](skills/erd/SKILL.md) | **관계형 DB 설계**가 필요할 때 | Mermaid `.mmd` (개념·논리·물리 3수준) |
-| [`domain-models`](skills/domain-models/SKILL.md) | Bounded Context의 경계·용어·불변 규칙 고정 | 도메인별 `DOMAIN.md` (폴더로 그루핑) |
-| [`policy-book`](skills/policy-book/SKILL.md) | 비즈니스 정책을 이력·버전과 함께 관리 | `POL-XXXX.md` 묶음 + 인덱스 |
+| [`domain-models`](skills/domain-models/SKILL.md) | Bounded Context의 경계·용어·불변 규칙 고정 | Aggregate별 `.md` (BC 폴더로 그루핑) |
 
 각 스킬 상세는 링크된 `SKILL.md` 참조.
-
-## ID 채번
-
-이 플러그인에서 **전역 ID**를 쓰는 건 `policy-book` 하나입니다.
-
-- **`POL-XXXX`** — 정책 파일마다 4자리 ID가 자동 채번되며, 대체·폐지·변경 이력 추적의 축이 됩니다.
-- 다른 스킬들은 ID 대신 **파일명·폴더명**으로 식별합니다:
-  - `lean-prd` — 파일 한 장 (`{project}-lean-prd.md`)
-  - `erd` — 파일명 패턴 (`{project}-{level}-erd.mmd`)
-  - `domain-models` — 도메인 폴더 슬러그 (`order/`, `payment/`)
-
-채번 부담을 지는 건 정책뿐입니다.
 
 ## 제한·주의
 
 - **`erd`는 관계형 DB 전제입니다.** Entity-Relationship 모델 자체가 RDBMS 설계 언어라 MongoDB·DynamoDB·Firestore 같은 문서·KV·그래프 DB에는 적용 범위가 제한적입니다. 비관계형 저장소의 구조는 `domain-models`의 엔티티 섹션이나 별도 스키마 다이어그램으로 표현하는 게 맞습니다.
-- **도메인 불변 규칙(`domain-models`의 Invariants)과 정책(`policy-book`)을 혼동하지 마세요.** 전자는 "바꾸면 도메인이 망가지는" 규칙, 후자는 "비즈니스 결정으로 바뀔 수 있는" 규칙입니다. 판별 질문은 각 SKILL.md 참조.
+- **도메인 불변 규칙(`domain-models`의 Invariants)과 비즈니스 정책을 혼동하지 마세요.** 전자는 "바꾸면 도메인이 망가지는" 규칙, 후자는 "비즈니스 결정으로 바뀔 수 있는" 규칙입니다.
 
 ## 스킬 간 관계
 
@@ -36,14 +23,13 @@
 lean-prd         ← 비전·범위 (한 장)
     │
     ▼
-domain-models     ← 도메인 경계·용어·불변 규칙 (도메인당 한 장)
-    │       ─────┐
-    ▼            ▼
-  erd        policy-book    ← 정책, 경계 가로지름
-(RDBMS 모델)  (POL-XXXX)
+domain-models     ← 도메인 경계·용어·불변 규칙 (Aggregate당 한 장)
+    │
+    ▼
+  erd             ← 관계형 DB 모델 (RDBMS 설계)
 ```
 
-`lean-prd` → `domain-models` → `policy-book`으로 상위→하위 참조. `erd`는 `domain-models`과 나란히 데이터 구조를 묘사합니다.
+`lean-prd` → `domain-models` 순으로 상위→하위 참조. `erd`는 `domain-models`과 나란히 데이터 구조를 묘사합니다.
 
 ## 설치
 
@@ -57,7 +43,7 @@ domain-models     ← 도메인 경계·용어·불변 규칙 (도메인당 한 
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/grimoire --skill lean-prd --skill erd --skill domain-models --skill policy-book
+npx skills add dev-goraebap/grimoire --skill lean-prd --skill erd --skill domain-models
 ```
 
 ## 공통 규약 — 경로 저장
@@ -75,7 +61,6 @@ npx skills add dev-goraebap/grimoire --skill lean-prd --skill erd --skill domain
 - ...
 - PRD: `docs/lean-prd.md`
 - Domain models: `docs/domains/`
-- Policy book: `docs/policies/`
 - ERDs: `docs/design/`
 ```
 
