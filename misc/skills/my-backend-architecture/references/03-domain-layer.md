@@ -100,11 +100,82 @@ domain/
 |-----------|------|
 | Entity | Aggregate Root 또는 내부 Entity. 식별자 보유. |
 | Value Object (VO) | 식별자 없이 값 자체로 의미. 불변. |
-| Domain Service | 여러 Entity·VO에 걸친 규칙 판정. 상태 없음. |
+| Domain Service | 여러 Entity·VO에 걸친 규칙 판정 + 상태 변경. |
 | Repository Interface | 영속성 계약. 구현은 infrastructure. |
-| Policy / Specification | 추상화된 판정 함수. Domain Service의 경량 형태. |
+| Policy / Specification | 교체 가능한 비즈니스 규칙. 단일 조건 판정 → Specification. 상태 변경 포함 → Domain Service(Policy). |
 | Factory | 복잡한 Aggregate 생성 로직 캡슐화. |
 | Domain Error | 도메인 용어로 이름 지은 예외 (`InsufficientTenureError`). |
+
+---
+
+## Invariant vs Policy — 코드 레벨 구분
+
+| | Invariant | Policy |
+|--|-----------|--------|
+| 위치 | Entity / Aggregate 메서드 | 별도 Policy·Specification 클래스 |
+| 성격 | 항상 참. 어기면 즉시 예외 | 비즈니스 결정으로 교체 가능 |
+| 예시 | "총금액 = 항목 합" | "3만 원 이상 무료배송" |
+| 변경 시 | Entity 수정 | Policy 클래스 교체 |
+
+```ts
+// Invariant — Entity 내부에서 항상 보장
+class Order {
+  addItem(item: OrderItem): void {
+    this.items.push(item);
+    this.recalculateTotal(); // 어기면 도메인이 망가짐 → Entity 안에
+  }
+}
+
+// Policy — 분리된 클래스. 교체 가능.
+class ShippingFeePolicy {
+  calculate(order: Order): Money {
+    return order.total.isGreaterThan(Money.of(30_000))
+      ? Money.ZERO
+      : Money.of(3_000);
+  }
+}
+```
+
+### Specification — 조건 판정만
+
+상태를 변경하지 않고 "조건 만족 여부"만 반환. Policy(Domain Service)의 내부 판정 조건으로 쓰인다.
+
+```ts
+class TenureSpecification {
+  constructor(private requiredMonths: number) {}
+  isSatisfiedBy(employee: Employee): boolean {
+    return employee.tenureMonths >= this.requiredMonths;
+  }
+}
+
+// Domain Service(Policy)가 Specification을 활용해 상태 변경
+class PromotionPolicy {
+  private spec = new TenureSpecification(12);
+
+  apply(employee: Employee, newPosition: Position): void {
+    if (!this.spec.isSatisfiedBy(employee)) throw new InsufficientTenureError();
+    employee.promote(newPosition); // 상태 변경 → Domain Service 영역
+  }
+}
+```
+
+### Policy 파일 위치
+
+```
+// Aggregate 단위 — 해당 Aggregate 폴더 안
+employee/
+├── employee.entity.ts
+├── employee.repository.ts
+├── rank-promotion.policy.ts     ← 이 Aggregate에 관련된 Policy
+└── vip-customer.specification.ts
+
+// BC 단위 — 여러 Aggregate에 걸치면 policies/ 폴더
+workforce/
+├── employee/
+├── organization/
+└── policies/                    ← BC 레벨 (여러 Aggregate 조합)
+    └── headcount-rebalance.policy.ts
+```
 
 ---
 

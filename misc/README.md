@@ -4,6 +4,18 @@
 
 `agent-cowork` 같이 주제가 명확한 플러그인으로 묶기 애매한 유틸리티들이 여기 모입니다. 공개 트랙과 달리 품질 보증이나 인터페이스 일관성은 보장하지 않으며, 개인 필요에 따라 변경·제거될 수 있습니다.
 
+## 어떤 스킬을 언제 쓰나
+
+| 스킬 | 쓰는 때 | 산출물 / 특징 |
+|------|---------|--------------|
+| [`pdf-parser`](skills/pdf-parser/SKILL.md) | PDF에서 텍스트 추출 | `.txt` 파일 저장 |
+| [`claude-hook-notify-setup`](skills/claude-hook-notify-setup/SKILL.md) | Claude Code 작업 완료·권한 요청 알림 설정 | OS 네이티브 토스트 + hooks 자동 등록 |
+| [`docs-to-md`](skills/docs-to-md/SKILL.md) | 기술 문서 사이트 → 로컬 Markdown | `.md` 파일 / 폴더 + `index.md` |
+| [`fsd-docs`](skills/fsd-docs/SKILL.md) | Feature-Sliced Design v2.1 개념·실전 참조 | Progressive Disclosure 지식 팩 |
+| [`my-backend-architecture`](skills/my-backend-architecture/SKILL.md) | 개인 선호 백엔드 레이어 아키텍처 참조 | Progressive Disclosure 지식 팩 |
+
+각 스킬 상세는 링크된 `SKILL.md` 참조.
+
 ## 설치
 
 ### Claude Code (플러그인)
