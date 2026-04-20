@@ -2,112 +2,103 @@
 section: shared-layer
 ---
 
-# shared Layer
+# shared 레이어
 
-도메인 의미 없는 **기술 인프라**가 모이는 자리. 어떤 레이어든 `shared`를 참조할 수 있다.
+## 역할
 
-## 전형적 세그먼트
+도메인 의미 없는 **기술 인프라**. **모든 레이어가 참조 가능**한 공통 기반.
+
+핵심 특징:
+- 파일명에 도메인 이름이 등장하지 않는다
+- 어느 프로젝트에 가져다 놓아도 그 자체로 동작하는 기술 유틸리티
+- 비즈니스 규칙 없음
+
+---
+
+## 전형 세그먼트
 
 | 세그먼트 | 담는 것 |
-|---|---|
-| `logger` | 로거 인터페이스 + 구현 (Winston·Pino 어댑터) |
-| `config` | `@nestjs/config` 기반 환경변수 파싱, zod schema 검증 |
-| `db` | DB 연결 팩토리, 트랜잭션 헬퍼, 공통 베이스 리포지토리 |
-| `util` | date(dayjs), string, number, crypto 헬퍼 |
-| `middleware` | HTTP 미들웨어 (request-id, access-log 등) |
-| `filters` | 예외 필터 (NestJS `HttpExceptionFilter`) |
-| `guards` | **기술적** 가드 (rate-limit 등). 도메인 권한 가드는 `app` 쪽 |
-| `errors` | 도메인 무관 기반 에러 (`NotFoundError`, `UnauthorizedError`) |
-| `types` | 횡단 TypeScript 타입 (`Result<T, E>`, `Paginated<T>`) |
+|----------|---------|
+| `logger` | 로거 인터페이스 + 구현체 |
+| `config` | 환경변수 파싱·검증 (zod 등) |
+| `db` | DB 연결·트랜잭션·스키마·마이그레이션·베이스 리포지토리 |
+| `util` | date·string·number·crypto 범용 헬퍼 |
+| `middleware` | 공통 HTTP 미들웨어 (요청 로깅 등) |
+| `filters` | 공통 예외 핸들러 (HTTP 에러 변환 등) |
+| `errors` | 기술 예외 기반 클래스 (도메인 에러와 다름) |
+| `types` | 범용 타입·인터페이스 |
 
-## 슬라이스 간 상호 참조 허용
+---
 
-`shared`는 [`02-slices.md`](02-slices.md) 규칙의 예외. 순환만 피하면 자유롭게 참조.
+## shared/db 구성
 
-```
-shared/logger   ──▶ shared/config    (OK, logger가 로그 레벨 읽음)
-shared/db       ──▶ shared/logger    (OK, DB 쿼리 로그)
-shared/config   ──▶ shared/logger    (OK)
-
-shared/a ──▶ shared/b ──▶ shared/a   (순환 금지)
-```
-
-순환이 나타나면 **더 작은 세그먼트로 쪼개거나 한쪽을 흡수**. 순환 자체는 대부분 설계 결함.
-
-## 여기 들어가면 안 되는 것
-
-### 도메인 의미가 묻은 코드
-
-`shared/user-helpers.ts` 같은 건 위험 신호. "User" 개념이 등장하면 `domain/users`로 이동.
-
-### 도메인 규칙
-
-할인율 계산·주문 상태 전이 같은 **비즈니스 규칙**은 어떤 경우에도 shared에 오면 안 된다.
-
-### 상위 레이어 전용 코드
-
-`app` 전용 DTO validator, `use-cases` 전용 interceptor는 shared가 아니라 해당 레이어 내부에.
-
-## shared에서 도메인 개념이 필요해 보일 때
-
-예: `shared/audit-logger`가 로그에 `userId`를 포함해야 하고 사용자 정보까지 조회하고 싶다 → **`domain/users` 참조 필요처럼 보이는 상황**.
-
-이럴 때 `shared → domain` 역참조를 하지 말고 **DIP로 해결**한다.
-
-- `shared/audit-logger`가 `interface UserContextProvider { getUserId(): string; getUserName(): string; }` 같은 **계약만 정의**.
-- 상위 레이어(`app` 또는 `domain`)가 이 계약을 구현한 객체를 런타임에 주입.
-
-패턴 상세: [`07-dip-patterns.md`](07-dip-patterns.md)의 "shared → domain 역참조 회피" 섹션.
-
-## shared의 크기 조절
-
-`shared`는 프로젝트 수명 중 가장 빨리 비대해지는 레이어다. 정기적으로 감사.
-
-- [ ] 1~2회만 쓰이는 유틸이 있나? → 슬라이스 내부로 내리거나 삭제.
-- [ ] 도메인 냄새 나는 파일이 끼었나? → domain으로 올린다.
-- [ ] 순환 있나? → 리팩터.
-- [ ] 세그먼트가 10개 이상인가? → 재분류 검토.
-
-## 슬라이스 내부 구조 예
+DB 관련 기술 자산은 모두 여기에.
 
 ```
-shared/
-├── logger/
-│   ├── logger.interface.ts
-│   ├── pino-logger.ts
-│   └── logger.module.ts
-├── config/
-│   ├── config.schema.ts         (zod)
-│   ├── config.service.ts
-│   └── config.module.ts
-├── db/
-│   ├── typeorm.module.ts
-│   ├── base-typeorm.repository.ts
-│   └── transaction-manager.ts
-├── util/
-│   ├── date.ts
-│   └── result.ts
-└── errors/
-    └── base-error.ts
+shared/db/
+├── connection.ts              ← DB 연결 팩토리 (DataSource / Drizzle db 등)
+├── transaction-manager.ts     ← 트랜잭션 헬퍼
+├── base-repository.ts         ← 도메인 무관 베이스 리포지토리 (선택)
+├── schema/                    ← Drizzle·Prisma 스키마 파일
+│   ├── employees.schema.ts
+│   └── organizations.schema.ts
+└── migrations/                ← DB 마이그레이션 파일
 ```
 
-각 세그먼트는 자체 NestJS 모듈로 export. 상위 레이어는 모듈을 import해 쓴다.
+**왜 스키마를 shared에?**  
+스키마는 "테이블 정의"라는 기술 자산이지 도메인 모델이 아니다.  
+`infrastructure`는 이 스키마를 **참조해** 도메인 어댑터(Repository·Query Service)를 작성한다.
 
-## shared vs infrastructure
+---
 
-이 스킬은 **`infrastructure/` 레이어를 기본 권장**한다 ([`01-layers.md`](01-layers.md)의 사용자 정의 레이어 섹션). 둘의 역할 분리:
+## 들어가면 안 되는 것
+
+| 잘못된 예 | 올바른 위치 |
+|-----------|------------|
+| `shared/user-helpers.ts` — 도메인 용어 포함 | `domain/user/` |
+| `shared/discount-calculator.ts` — 비즈니스 규칙 | `domain/pricing/` |
+| `shared/employee-validator.ts` — app 전용 | `app/employees/` |
+
+**판단 기준**: "이 파일이 다른 프로젝트에서도 그대로 쓰일 수 있는가?" → Yes면 shared. No면 해당 레이어.
+
+---
+
+## shared가 도메인 개념 필요할 때
+
+`shared`가 도메인 개념에 의존해야 하는 상황이 생기면 **DIP로 해결**한다.
+
+```ts
+// shared/notifications/notification.interface.ts
+// shared가 정의하는 인터페이스 (구현 없음)
+export interface NotificationSender {
+  send(userId: string, message: string): Promise<void>;
+}
+```
+
+구현체는 `infrastructure/`에, 바인딩은 `app/` 또는 bootstrapping 레이어에서.  
+`shared`는 인터페이스만 알고, 구현을 모른다.
+
+---
+
+## 세그먼트 간 상호 참조
+
+순환만 피하면 자유롭게 참조 가능.
+
+```
+shared/logger   ──▶ shared/config    ✅
+shared/db       ──▶ shared/logger    ✅
+
+shared/a ──▶ shared/b ──▶ shared/a   ❌ 순환 금지
+```
+
+순환이 생기면 한쪽을 더 작게 쪼개거나 흡수한다.
+
+---
+
+## shared vs infrastructure 요약
 
 | | shared | infrastructure |
 |---|---|---|
-| 담는 것 | 기술 인프라 **일반** (logger, util, 베이스 리포지토리) | 도메인 리포지토리 **구현체**, 외부 API 어댑터 |
-| 도메인 이름이 파일명에 등장? | **절대 안 됨** | 정상 (`infrastructure/users/user.typeorm.repository.ts`) |
-| 필수성 | 항상 필요 | 기본 권장 (작은 프로젝트에서도 가볍게 시작) |
-
-**왜 shared에 구현체를 두지 않나**: `shared`는 "도메인 의미 없는 기술 세그먼트" 원칙이다. `shared/db/users.typeorm.repository.ts`처럼 도메인 이름이 파일명에 들어가는 순간 원칙 위반 — `infrastructure`가 그 자리.
-
-## 체크리스트
-
-- [ ] shared 어떤 파일에 도메인 용어가 등장하는가? → domain으로 이동.
-- [ ] shared 간 순환 있는가? → 리팩터 필수.
-- [ ] 공통 유틸이 실제로는 한 슬라이스만 쓰는가? → 슬라이스 내부로 이동.
-- [ ] shared → domain import 있는가? → **절대 금지**. DIP로 해결.
+| 도메인 이름이 파일명에? | ❌ | ✅ |
+| 비즈니스 로직? | ❌ | Repository 경계 안에서만 |
+| 예시 | `logger`, `config`, `db/connection` | `employee.typeorm.repository`, `stripe.gateway` |

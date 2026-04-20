@@ -1,76 +1,62 @@
 ---
 name: my-backend-architecture
 description: >-
-  사용자 개인의 백엔드 아키텍처 선호(3-레이어 기본: app / domain / shared, 선택적 상위 레이어
-  use-cases 또는 features)를 성문화한 Progressive Disclosure 지식 스킬. FSD에서 영감을 받았지만
-  백엔드용으로 조정. 단방향 레이어 의존, 슬라이스 간 참조 금지(shared 예외), API 경로-폴더 대응
-  (api/users ↔ app/users), ORM별 도메인 모델 전략(TypeORM rich entity vs Drizzle/Prisma 분리형),
-  DIP로 푸는 같은 레이어 의존(상위 레이어 승격 vs 계약 인터페이스 분리), 도메인 정책 단위 테스트
-  우선 철학을 다룬다. NestJS 중심 예시와 Spring Boot(설정 응집형) 대비, 모듈 경계를 정적으로
-  강제하는 수단(eslint-plugin-boundaries, dependency-cruiser, Nx enforce-module-boundaries,
-  @nestjs/cqrs EventBus, 동적 모듈 forRoot bootstrapping, TypeScript path alias)을 담는다.
-  사용자가 "백엔드 폴더 구조", "레이어드 아키텍처", "도메인 레이어 어디 둬", "NestJS 모듈 경계",
-  "같은 레이어 참조 금지", "도메인 모델을 엔티티에 둘까", "Drizzle에서 도메인 모델", "DIP",
-  "use-cases 레이어", "app 레이어 vs domain", "shared 역참조", "NestJS 슬라이스 경계" 같은
-  질문을 할 때 references/에서 관련 섹션만 로드해 답한다.
-  Triggers — "my-backend-architecture", "백엔드 아키텍처", "레이어드 아키텍처", "백엔드 폴더
-  구조", "NestJS 모듈 경계", "도메인 레이어 구조", "DIP 해결", "같은 레이어 참조", "use-cases
-  레이어", "Drizzle 도메인 모델", "TypeORM rich entity", "dependency-cruiser".
+  사용자 개인의 백엔드 아키텍처 선호(기본 4레이어: app / domain / infrastructure / shared,
+  선택적 사용자 정의 중간 레이어)를 Progressive Disclosure로 정리한 지식 스킬.
+  FSD의 레이어 참조 규칙을 백엔드용으로 재구성. app은 resource(API 리소스) 단위,
+  나머지는 module 단위. app은 Presentation+Application 결합형(의도적 타협).
+  같은 레이어 module 간 참조 금지, domain은 허용(BC 간 ID 타입 외 강한 의존 지양),
+  shared는 순환만 피하면 자유. infrastructure→domain DIP(import 방향 역전),
+  domain은 프레임워크 의존 없는 순수 코드. 읽기는 Query Service(domain 우회),
+  도메인 단위 테스트 우선, ORM별 도메인 모델 배치 전략을 다룬다.
+  Triggers — "백엔드 아키텍처", "레이어드 아키텍처", "도메인 레이어 구조",
+  "Domain Service", "Application Service", "Repository 주입",
+  "Drizzle 스키마 위치", "사용자 정의 레이어", "Aggregate", "BC 간 참조",
+  "읽기 경로", "DIP", "의존 역전", "레이어 참조 규칙".
 license: MIT
 ---
 
 # my-backend-architecture
 
-사용자 개인의 **백엔드 코드 구조 선호**를 정리한 지식 스킬. SKILL.md는 라우팅 테이블 역할만 하고, 실제 내용은 10개 references에 Progressive Disclosure로 분할되어 있다. 사용자 질문 유형에 따라 필요한 파일만 로드해 답한다.
+사용자 개인의 **백엔드 코드 구조 선호**를 정리한 지식 스킬. SKILL.md는 라우팅 테이블 역할만 하고, 실제 내용은 references에 Progressive Disclosure로 분할되어 있다. 사용자 질문 유형에 따라 필요한 파일만 로드해 답한다.
 
-## 핵심 원칙 (요약 5줄)
+## 핵심 원칙
 
-1. 기본 레이어 3개: `app` → `domain` → `shared`. 필요하면 `app`과 `domain` 사이에 **사용자 정의 상위 레이어**(`use-cases` 또는 `features`) 하나 추가.
-2. 의존은 **단방향**. 위 레이어는 아래 레이어를 참조할 수 있지만 역방향 금지.
-3. 같은 레이어 내 슬라이스끼리는 서로 참조하지 않는다. `shared`만 예외 — 도메인 무관한 세그먼트라 순환만 피하면 OK.
-4. `app`은 API 리소스 경로와 폴더가 1:1 대응(`api/users` ↔ `app/users`). `domain`은 외부 의존을 최소화해 단위 테스트를 쉽게 쓸 수 있는 상태로 유지.
-5. 같은 레이어 슬라이스끼리 기능이 엮이면 **DIP**로 푼다 — 상위 레이어로 승격(A) 또는 계약 인터페이스로 분리(B).
+1. **기본 레이어 4개**: `app` / `domain` / `infrastructure` / `shared`. 그 사이에 **사용자 정의 중간 레이어**를 필요할 때만 삽입한다. 이름·개수는 팀이 결정. 빈 레이어는 세금.
+2. 의존은 **단방향**. 상위 레이어의 module(resource)은 하위 레이어의 module만 참조 가능. 역방향 import 전면 금지. 단 `infrastructure`는 `domain` 인터페이스를 구현하므로 **import 방향이 역전**(DIP).
+3. **`app`은 resource 단위**, 나머지는 **module 단위**. `domain`은 프레임워크 의존 없는 순수 코드.
+4. **같은 레이어 module 간 참조 금지** (`domain`·`shared` 제외). 해결책: 공통 로직을 하위 레이어로 추출하거나, 중간 레이어에 인터페이스를 두고 DIP 적용.
+5. 규칙 판정은 `domain`에, 오케스트레이션·I/O·트랜잭션은 `app` / 중간 레이어에. Repository는 Application Service에만 주입, Domain Service에는 인자 전달.
 
 ## 의존 다이어그램
 
 ```
-app ──▶ (use-cases | features)? ──▶ domain ──▶ shared
-                                                   ▲
-                                   shared 내부: 양방향 순환만 피하면 상호 참조 허용
-
-역방향 금지.  같은 레이어 슬라이스 간 참조 금지 (shared 예외).
+app (resource)
+  ↓
+(사용자 정의 중간 레이어)?   module. 이름 자유. 선택.
+  ↓
+domain  ◄───────── infrastructure   ← DIP: infrastructure가 domain 인터페이스 구현
+(module)           (module)
+  ↓                    ↓
+shared              ← 모든 레이어가 shared 참조 가능
 ```
 
 ## 라우팅 테이블
 
-사용자 질문 → 로드할 references.
-
 | 사용자가 묻는 것 | 파일 |
 |---|---|
-| "이 스킬 뭐야", "왜 존재", 스코프, 클린 아키텍처와의 차이 | [`references/00-overview.md`](references/00-overview.md) |
-| "어떤 레이어가 있지", "레이어 책임" | [`references/01-layers.md`](references/01-layers.md) |
-| "슬라이스", "같은 레이어 참조해도 돼?" | [`references/02-slices.md`](references/02-slices.md) |
-| "컨트롤러 어디에", "app 레이어 구조", "오케스트레이션" | [`references/03-app-layer.md`](references/03-app-layer.md) |
-| "도메인 레이어에 뭘", "도메인 모델 어디", "외부 의존성 얼마나" | [`references/04-domain-layer.md`](references/04-domain-layer.md) |
-| "shared에 뭐가 들어가", "공통 유틸 어디" | [`references/05-shared-layer.md`](references/05-shared-layer.md) |
-| "TypeORM 도메인 모델", "Drizzle 스키마", "Prisma 리포지토리" | [`references/06-orm-strategies.md`](references/06-orm-strategies.md) |
-| "같은 레이어 기능 재사용", "DIP", "A안 vs B안", "shared에서 도메인 필요" | [`references/07-dip-patterns.md`](references/07-dip-patterns.md) |
-| "뭘 테스트해야", "도메인 테스트 범위", "통합 테스트 필요?" | [`references/08-testing.md`](references/08-testing.md) |
-| "NestJS 모듈 경계 강제", "eslint-plugin-boundaries", "Spring Boot와 차이", "forRoot bootstrapping" | [`references/09-framework-notes.md`](references/09-framework-notes.md) |
-
-## 자주 묻는 조합
-
-| 상황 | 조합 |
-|---|---|
-| "NestJS에서 백엔드 폴더 나누는 이유?" | `00` + `01` |
-| "같은 레이어 참조가 필요해" | `02` + `07` |
-| "Drizzle 쓰는데 도메인 모델 어디" | `06` + `04` |
-| "NestJS 모듈이 경계 뚫음" | `09` + `02` |
-| "도메인 레이어 테스트 범위" | `08` + `04` |
-| "shared에서 도메인 개념 필요" | `05` + `07` |
+| 레이어 구조, 참조 방향 규칙, module/resource 명명, Public API(barrel) | [`references/01-layers-and-modules.md`](references/01-layers-and-modules.md) |
+| app 레이어 책임, Presentation+Application 결합, 컨트롤러/서비스 구분, 읽기/쓰기 경로 | [`references/02-app-layer.md`](references/02-app-layer.md) |
+| 도메인 모델, Aggregate, Domain Service vs Application Service, Repository 주입 원칙, BC 간 참조 | [`references/03-domain-layer.md`](references/03-domain-layer.md) |
+| infrastructure 책임, DIP import 방향, ORM별 배치, shared/db vs infrastructure, BC 경계 ORM 관계 | [`references/04-infrastructure-layer.md`](references/04-infrastructure-layer.md) |
+| shared 구성, segment 구분, shared vs infrastructure, DB 스키마 위치 | [`references/05-shared-layer.md`](references/05-shared-layer.md) |
+| 중간 레이어 도입 시점, 하위 추출 vs 인터페이스 분리, use-cases·features·contracts | [`references/06-custom-layers.md`](references/06-custom-layers.md) |
+| 테스트 전략, 도메인 단위 테스트, 오케스트레이션 테스트, TransactionManager·외부 서비스 Fake, 통합 테스트 | [`references/07-testing.md`](references/07-testing.md) |
+| ORM 비교(TypeORM·Drizzle·Prisma), 적용 범위, 의식적 타협 | [`references/08-misc.md`](references/08-misc.md) |
 
 ## 원칙
 
-- **완벽한 클린 아키텍처 지향 아님**. 도메인이 `shared`를 참조하는 건 허용. 이유는 `00-overview.md`의 "Not Clean Architecture".
-- **프레임워크 강제 없음**. NestJS가 주 예시지만 원리는 일반적. Spring Boot 등 설정 응집형 DI 환경과의 차이는 `09-framework-notes.md`.
+- **완벽한 클린 아키텍처 지향 아님**. `domain`이 `shared`를 참조하는 건 허용. 상세: `08-misc.md`.
+- **NestJS가 주 예시**지만 원리는 DI 프레임워크가 있는 환경 전반에 적용 가능.
 - **테스트 1순위는 도메인 정책·비즈니스 규칙**. 나머지는 선택.
+- 이 스킬의 **"module"은 폴더 단위 코드 경계**. DI 프레임워크의 Module/Component 어노테이션과 다른 개념.
