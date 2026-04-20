@@ -19,7 +19,7 @@
 npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup --skill docs-to-md --skill fsd-docs --skill my-backend-architecture
 ```
 
-> 기획·설계 문서 스킬(`lean-prd`, `erd`, `domain-models`, `policy-book`)은 `blueprints` 플러그인으로 이동했습니다. [blueprints/README.md](../blueprints/README.md) 참조.
+> 기획·설계 문서 스킬(`lean-prd`, `erd`, `domain-models`)은 `blueprints` 플러그인으로 이동했습니다. [blueprints/README.md](../blueprints/README.md) 참조.
 
 ## 포함된 스킬
 

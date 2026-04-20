@@ -20,7 +20,7 @@
     {
       "name": "blueprints",
       "source": "./blueprints/",
-      "description": "Design-doc skills that support implementation: lean-prd (interview-based lightweight PRD), erd (Mermaid ERD at conceptual/logical/physical levels), domain-models (one DOMAIN.md per Bounded Context with Aggregate structure, invariants per Aggregate, and external-context collaboration), policy-book (ADR-style business policy registry with POL-XXXX IDs). All skills use AGENTS.md/CLAUDE.md to store per-project paths instead of separate config files, and share a no-prefix naming philosophy for ongoing-maintenance documents.",
+      "description": "Design-doc skills that support implementation: lean-prd (interview-based lightweight PRD), erd (Mermaid ERD at conceptual/logical/physical levels), domain-models (per-Aggregate .md files with BC folder grouping, invariants, and external-context collaboration). All skills use AGENTS.md/CLAUDE.md to store per-project paths instead of separate config files, and share a no-prefix naming philosophy for ongoing-maintenance documents.",
       "version": "0.2.0"
     }
   ]

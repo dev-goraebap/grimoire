@@ -183,8 +183,8 @@ Project / Service
 |------|------|---------|
 | 도메인 본질 규칙 | "주문은 최소 1개 항목" | Invariants |
 | 도메인 본질 규칙 | "총금액 = 항목금액 합" | Invariants |
-| 비즈니스 의사결정 | "주문 후 7일 내 무료 반품" | `policy-book` (POL) |
-| 비즈니스 의사결정 | "3만 원 이상 배송비 무료" | `policy-book` (POL) |
+| 비즈니스 의사결정 | "주문 후 7일 내 무료 반품" | 별도 정책 문서 |
+| 비즈니스 의사결정 | "3만 원 이상 배송비 무료" | 별도 정책 문서 |
 
 ### 4-5. External Dependencies 포맷
 
@@ -287,14 +287,14 @@ BC 폴더가 이미 존재하면 그 안에 바로 배치. 없으면 신설.
 
 ```markdown
 ## Related Policies
-- [POL-0001 환불 정책](../../policies/POL-0001-refund.md)
+- [환불 정책](../../policies/refund.md)
 ```
 
-`policy-book` 스킬이 아직 쓰이지 않아 값이 없으면 플레이스홀더로 남긴다:
+값이 없으면 플레이스홀더로 남긴다:
 
 ```markdown
 ## Related Policies
-<!-- policy-book 스킬로 정책 추가 시 자동으로 링크됩니다 -->
+<!-- 정책 문서 추가 시 링크를 여기에 기록합니다 -->
 ```
 
 ---
