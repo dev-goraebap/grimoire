@@ -20,8 +20,8 @@
     {
       "name": "ddd-workshop",
       "source": "./ddd-workshop/",
-      "description": "Pipeline skills that guide a developer from a vague idea to DDD aggregate design. Seven conversational skills run in sequence: project-kickoff (context and scope), domain-research (epistemic self-audit and research), requirement-clarifier (gap and contradiction hunt), ubiquitous-language-extractor (glossary and homonym detection), event-flow-mapper (solo Event Storming), bounded-context-identifier (context boundary detection), strategic-classifier (Core/Supporting/Generic), aggregate-designer (aggregates, invariants, policies). Each skill is standalone, supports partial entry, and enforces Epistemic Honesty.",
-      "version": "0.1.0"
+      "description": "DDD pipeline — 5 conversational skills following subdomain → BC → Aggregate ordering. requirements-refiner (context + 8-item self-audit + optional web research + 1-Q-at-a-time queue), domain-language-extractor (UL + lightweight event flow + subdomain candidates), subdomain-classifier (Core/Supporting/Generic + Slice-first selection), context-designer (BC design + Context Map for the selected slice), aggregate-designer (Design-Level Event Storming + Aggregate + Invariant/Policy, one Aggregate per call). Every skill embeds a shared UX protocol, writes `sources:` headers for stale detection, and supports `--update` mode for delta edits when requirements shift.",
+      "version": "0.2.0"
     }
   ]
 }

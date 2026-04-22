@@ -1,23 +1,24 @@
 {
   "name": "ddd-workshop",
-  "version": "0.1.0",
-  "description": "Pipeline skills that guide a developer from a vague idea to DDD aggregate design. Seven conversational skills run in sequence: project-kickoff (context and scope), domain-research (epistemic self-audit and research), requirement-clarifier (gap and contradiction hunt), ubiquitous-language-extractor (glossary and homonym detection), event-flow-mapper (solo Event Storming), bounded-context-identifier (context boundary detection), strategic-classifier (Core/Supporting/Generic), aggregate-designer (aggregates, invariants, policies). Each skill is standalone, supports partial entry, and enforces Epistemic Honesty.",
+  "version": "0.2.0",
+  "description": "DDD pipeline: 5 conversational skills guide a developer from a vague idea to Aggregate design, following the subdomain → BC → Aggregate ordering. requirements-refiner (context + 8-item self-audit + optional web research + 1-Q-at-a-time queue), domain-language-extractor (UL + lightweight event flow + subdomain candidates — not BC candidates), subdomain-classifier (subdomain Core/Supporting/Generic + Slice-first choice), context-designer (BC design + Context Map for the selected slice), aggregate-designer (Design-Level Event Storming + Aggregate + Invariant/Policy, one Aggregate per call). Every skill embeds a shared UX protocol (numbered menus, progress markers, skip-allowed), writes `sources:` headers for stale detection, and supports `--update` mode for delta edits when requirements shift.",
   "author": {
     "name": "dev-goraebap",
     "email": "dev.goraebap@gmail.com"
   },
   "homepage": "https://github.com/dev-goraebap/grimoire",
-  "repository": "https://github.com/dev-goraebap/grimoire",
+   "repository": "https://github.com/dev-goraebap/grimoire",
   "license": "MIT",
   "keywords": [
     "ddd",
     "domain-driven-design",
-    "event-storming",
-    "aggregate",
+    "subdomain",
     "bounded-context",
     "ubiquitous-language",
-    "domain-research",
+    "event-storming",
+    "aggregate",
     "epistemic-honesty",
+    "slice-first",
     "agent-skills"
   ]
 }
