@@ -20,8 +20,8 @@
     {
       "name": "ddd-workshop",
       "source": "./ddd-workshop/",
-      "description": "DDD pipeline — 6 conversational skills following the canonical strategic-then-tactical order. requirements-refiner (Pre-DDD: context + UL base language + 8-item self-audit), event-storming-explorer (Big Picture Event Storming + subdomain *identification* only, no classification), subdomain-classifier (narrowed: Core/Supporting/Generic + Slice-first target), context-designer (Bounded Context + Context Map + per-BC Canvas with embedded per-BC Ubiquitous Language in bilingual 용어/Code Identifier/의미 format; cross-BC terms go to optional published-language.md), screen-inventory (optional per-BC screen list surfacing read-paths without wireframes), aggregate-designer (Design-Level Event Storming + Aggregate + Invariant/Policy + Exposed Queries cross-checked against screen-inventory; Aggregate-reconstruction-for-reads forbidden). Artifacts live in docs/shared/contexts/<bc>/ with no YAML frontmatter.",
-      "version": "0.3.0"
+      "description": "DDD pipeline — 7 conversational skills across Pre-DDD, Strategic, Tactical, and Implementation phases. requirements-refiner (Pre-DDD: context + UL language + 8-item self-audit), event-storming-explorer (Strategic: Big Picture ES + subdomain identification only), subdomain-classifier (Strategic: Core/Supporting/Generic + Slice-first), context-designer (Strategic: Bounded Context + Context Map + per-BC Canvas with embedded per-BC UL in bilingual 용어/Code Identifier/의미 format), screen-inventory (Strategic, optional: per-BC screen list for read-paths), aggregate-designer (Tactical: Design-Level ES + Aggregate + Invariant/Policy + Exposed Queries; Aggregate-reconstruction-for-reads forbidden), implementation-blueprint (Implementation: folder structure + layer boundaries + BC communication patterns for a monolithic backend via 10-question interview; covers folder names only, not file/class/function names). Artifacts in docs/shared/contexts/<bc>/ with no YAML frontmatter.",
+      "version": "0.4.0"
     }
   ]
 }
