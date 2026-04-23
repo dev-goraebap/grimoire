@@ -1,0 +1,25 @@
+{
+  "name": "fsd-workshop",
+  "version": "0.1.0",
+  "description": "FSD (Feature-Sliced Design) workshop pipeline — 3 conversational skills for planning FSD architecture from requirements before any UI or code is written. requirements-analyzer (1/3: extract pages, routes, user roles from any input doc; produces fsd-blueprint.md skeleton), structure-planner (2/3: interview-driven layout zones, shared/ui candidates, widgets candidates, authentication design; refines fsd-blueprint.md), framework-adapter (3/3: maps FSD plan to specific framework folder structure — Next.js App Router, SvelteKit, Nuxt, Angular; completes fsd-blueprint.md with full directory tree). Single evolving document fsd-blueprint.md is refined by each skill.",
+  "author": {
+    "name": "dev-goraebap",
+    "email": "dev.goraebap@gmail.com"
+  },
+  "homepage": "https://github.com/dev-goraebap/grimoire",
+  "repository": "https://github.com/dev-goraebap/grimoire",
+  "license": "MIT",
+  "keywords": [
+    "fsd",
+    "feature-sliced-design",
+    "frontend-architecture",
+    "pages",
+    "layouts",
+    "shared-ui",
+    "widgets",
+    "nextjs",
+    "sveltekit",
+    "angular",
+    "agent-skills"
+  ]
+}

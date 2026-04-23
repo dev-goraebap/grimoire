@@ -22,6 +22,12 @@
       "source": "./ddd-workshop/",
       "description": "DDD pipeline — 7 conversational skills across Pre-DDD, Strategic, Tactical, and Implementation phases. requirements-refiner (Pre-DDD: context + UL language + 8-item self-audit), event-storming-explorer (Strategic: Big Picture ES + subdomain identification only), subdomain-classifier (Strategic: Core/Supporting/Generic + Slice-first), context-designer (Strategic: Bounded Context + Context Map + per-BC Canvas with embedded per-BC UL in bilingual 용어/Code Identifier/의미 format), screen-inventory (Strategic, optional: per-BC screen list for read-paths), aggregate-designer (Tactical: Design-Level ES + Aggregate + Invariant/Policy + Exposed Queries; Aggregate-reconstruction-for-reads forbidden), implementation-blueprint (Implementation: folder structure + layer boundaries + BC communication patterns for a monolithic backend via 10-question interview; covers folder names only, not file/class/function names). Artifacts in docs/shared/contexts/<bc>/ with no YAML frontmatter.",
       "version": "0.4.0"
+    },
+    {
+      "name": "fsd-workshop",
+      "source": "./fsd-workshop/",
+      "description": "FSD (Feature-Sliced Design) workshop pipeline — 3 conversational skills for planning FSD architecture from requirements before UI or code is written. requirements-analyzer (1/3: extract pages, routes, user roles; produces fsd-blueprint.md skeleton), structure-planner (2/3: layout zones, shared/ui candidates, widgets candidates, authentication design), framework-adapter (3/3: maps FSD plan to framework-specific folder structure — Next.js, SvelteKit, Nuxt, Angular). Single evolving fsd-blueprint.md refined by each skill.",
+      "version": "0.1.0"
     }
   ]
 }
