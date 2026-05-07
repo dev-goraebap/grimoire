@@ -15,6 +15,7 @@
 | [`my-backend-architecture`](skills/my-backend-architecture/SKILL.md) | 개인 선호 백엔드 레이어 아키텍처 참조 | Progressive Disclosure 지식 팩 |
 | [`material3`](skills/material3/SKILL.md) | Material Design 3 가이드라인 참조 | Progressive Disclosure 지식 팩 (117p) |
 | [`pg-query`](skills/pg-query/SKILL.md) | PostgreSQL DB 직접 조회 | Node.js `pg` 스크립트, 테이블/JSON 출력 |
+| [`erd`](skills/erd/SKILL.md) | ERD 생성·코드 동기화 (요구사항→초안 / 소스코드→동기화) | Mermaid `.mmd` 파일, 다크 테마 |
 
 각 스킬 상세는 링크된 `SKILL.md` 참조.
 
@@ -30,7 +31,7 @@
 ### 그 외 에이전트 (`skills.sh`)
 
 ```bash
-npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup --skill docs-to-md --skill fsd-docs --skill my-backend-architecture --skill material3 --skill pg-query
+npx skills add dev-goraebap/grimoire --skill pdf-parser --skill claude-hook-notify-setup --skill docs-to-md --skill fsd-docs --skill my-backend-architecture --skill material3 --skill pg-query --skill erd
 ```
 
 > 기획·설계 문서 스킬(`lean-prd`, `erd`, `domain-models`)은 `blueprints` 플러그인으로 이동했습니다. [blueprints/README.md](../blueprints/README.md) 참조.
@@ -197,6 +198,33 @@ M3 Button 컴포넌트 변형 종류 알려줘
 **제외 항목:** Blog, 상세 Spec(픽셀 수치), Accessibility 세부 페이지, UX 라이팅 가이드
 
 자세한 라우팅은 [SKILL.md](skills/material3/SKILL.md) 참조.
+
+---
+
+### `erd` (v1.0)
+
+요구사항이나 소스코드에서 **ERD를 Mermaid `.mmd` 파일로 생성·동기화**하는 스킬. 개념·논리·물리 3종 ERD를 지원하며 다크 테마 + handDrawn 스타일로 출력합니다. 다른 스킬이나 외부 환경에 의존하지 않고 독립 실행됩니다.
+
+**3가지 모드:**
+
+| 모드 | 사용 시점 | 입력 |
+|------|---------|------|
+| 요구사항 기반 초안 | DB 설계 시작 전, 도메인 개념화 | PRD / DDD 산출물 / 러프한 설명 |
+| 코드 동기화 | 구현 후 ERD를 코드와 맞춤 | TypeORM · Prisma · Drizzle · JPA · SQL DDL · Django |
+| 기존 ERD 수정 | 변경 사항 반영 | `.mmd` 파일 경로 |
+
+**사용 예:**
+
+```
+ERD 만들어줘
+테이블 관계도 그려줘
+코드에서 ERD 뽑아줘
+ERD 동기화해줘
+```
+
+**요구:** 없음 (의존성 없이 독립 실행)
+
+자세한 절차는 [SKILL.md](skills/erd/SKILL.md) 참조.
 
 ## 주의
 
