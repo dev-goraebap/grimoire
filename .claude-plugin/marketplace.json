@@ -20,7 +20,7 @@
     {
       "name": "ddd-workshop",
       "source": "./ddd-workshop/",
-      "description": "DDD learning-friendly workshop — rebuild that treats domain understanding itself as the primary artifact, not a downstream deliverable. First skill domain-storytime: a 1:1 learning session that walks through unfamiliar domains via actor-by-actor time-ordered narratives. Takes RFP/requirements docs/research as input, runs persona-perspective chapter-sized stories + 'why does this exist?' explanations + interactive question turns + confidence tags ([확실/일반론/추측]) marking validation hotspots. Artifact persistence is optional — comprehension is the goal, not the deliverable.",
+      "description": "DDD learning-friendly workshop — rebuild that treats domain understanding itself as the primary artifact, not a downstream deliverable. First skill bigpicture-storytime: a 1:1 learning-friendly variant of Big Picture Event Storming. Instead of a group workshop where domain experts throw events on a wall, the user (learner) and AI (virtual domain expert) accumulate the same big picture artifact (time-ordered events, actors, external systems, hotspots, pivot events) one actor and one chapter at a time. Persona-perspective chapter-sized stories (5–7 scenes) + 'why does this exist?' explanations + confidence tags ([확실/일반론/추측]) marking validation hotspots + actor-by-actor accumulation. Artifact persistence is optional — comprehension is the goal.",
       "version": "0.5.0"
     },
     {
