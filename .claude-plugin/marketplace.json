@@ -20,8 +20,8 @@
     {
       "name": "ddd-workshop",
       "source": "./ddd-workshop/",
-      "description": "DDD learning-friendly workshop — rebuild that treats domain understanding itself as the primary artifact, not a downstream deliverable. First skill bigpicture-storytime: a 1:1 learning-friendly variant of Big Picture Event Storming. Instead of a group workshop where domain experts throw events on a wall, the user (learner) and AI (virtual domain expert) accumulate the same big picture artifact (time-ordered events, actors, external systems, hotspots, pivot events) one actor and one chapter at a time. Persona-perspective chapter-sized stories (5–7 scenes) + 'why does this exist?' explanations + confidence tags ([확실/일반론/추측]) marking validation hotspots + actor-by-actor accumulation. Artifact persistence is optional — comprehension is the goal.",
-      "version": "0.5.2"
+      "description": "DDD learning-friendly workshop with two paired skills. (1) domain-classroom — teaches general industry patterns of an unfamiliar domain in lecture mode, grounded in cognitive-science 8 principles (Cognitive Load, Practice Testing, distributed practice, elaborative interrogation, self-explanation/Feynman, schema connection, dual coding, desirable difficulty). Menu-driven priority bundles → phase deep-dive → baseline 3 Q&A with skip/continue choice. Laws and standards are integrated as study material, not mere citations. Output: study-notebook at docs/learning-notes/{domain}-classroom.md. (2) bigpicture-storytime — 1:1 learning-friendly variant of Big Picture Event Storming. Accumulates the standard big picture artifact (time-ordered events, actors, external systems, hotspots, pivots, ubiquitous language) one actor and one chapter at a time via persona-perspective narratives + why-explanations + confidence tags. Output: docs/bigpicture.md. The two form a pipeline: domain-classroom for general patterns first, then bigpicture-storytime for client-specific overlay. Either runs standalone.",
+      "version": "0.6.0"
     },
     {
       "name": "fsd-workshop",
