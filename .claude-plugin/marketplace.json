@@ -20,8 +20,8 @@
     {
       "name": "ddd-workshop",
       "source": "./ddd-workshop/",
-      "description": "DDD learning-friendly workshop — rebuild that treats domain understanding itself as the primary artifact, not a downstream deliverable. First skill bigpicture-storytime: a 1:1 learning-friendly variant of Big Picture Event Storming. Instead of a group workshop where domain experts throw events on a wall, the user (learner) and AI (virtual domain expert) accumulate the same big picture artifact (time-ordered events, actors, external systems, hotspots, pivot events) one actor and one chapter at a time. Persona-perspective chapter-sized stories (5–7 scenes) + 'why does this exist?' explanations + confidence tags ([확실/일반론/추측]) marking validation hotspots + actor-by-actor accumulation. Artifact persistence is optional — comprehension is the goal.",
-      "version": "0.5.1"
+      "description": "DDD pipeline with two paired skills. (1) domain-classroom — teaches general industry patterns of an unfamiliar domain in lecture mode, grounded in cognitive-science 8 principles. Menu-driven priority bundles → phase deep-dive → 3 baseline Q&A with skip/continue. Laws and standards integrated as study material. AI judges if input materials are needed. Output: docs/learning-notes/{domain}-classroom.md. (2) bigpicture — 1:1 analytic tool for Big Picture EventStorming. Maps general patterns from domain-classroom + client materials into the canonical Big Picture artifact (time-ordered events, phases, actors, external systems, hotspots, pivots). No personas, no narrative — phase-by-phase analytic accumulation. Domain-event 4-criteria gate prevents UI/telemetry contamination. Korean natural-language + Code Identifier dual notation. Hotspots tagged with ID, where-answered, confidence. Output: docs/eventstorming.md (single file, auto-splits to folder when later stages join). Initial/Update/Cycle modes — repeatable after code is written. UL/BC/Aggregate explicitly excluded as they belong to later stages. Either skill runs standalone or as a pipeline.",
+      "version": "0.7.0"
     },
     {
       "name": "fsd-workshop",
