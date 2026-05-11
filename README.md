@@ -11,7 +11,7 @@
 | 챕터 | 설명 | 문서 |
 |---|---|---|
 | `agent-cowork` | 에이전트 협업 스킬북 — 공개 지침 운영, 공유 문서 관리, 컨텍스트 이관 등 (공개 트랙) | [README](agent-cowork/README.md) |
-| `ddd-workshop` | DDD/EventStorming 1:1 워크숍 스킬북 — 도메인 학습 → EventStorming 사이클(Big Picture · Process Modeling · BC+Subdomain 후보) → 구조적 결정(ADR) 박제까지 한 사람이 AI와 함께 누적 | [README](ddd-workshop/README.md) |
+| `ddd-workshop` | DDD/EventStorming 1:1 워크숍 스킬북 — 도메인 학습 → EventStorming 사이클(Big Picture · Process Modeling · BC+Subdomain 후보) → 구조적 결정(ADR) → 워크플로 전술 plan 까지. 사용 가이드를 AGENTS.md/CLAUDE.md에 박제하는 playbook 포함 (5 스킬) | [README](ddd-workshop/README.md) |
 | `fsd-workshop` | FSD(Feature-Sliced Design) 설계 워크숍 스킬북 — 요구사항에서 프레임워크별 폴더 트리까지 3단계 대화형 (requirements-analyzer → structure-planner → framework-adapter) | [folder](fsd-workshop/) |
 | `misc` | 개인 잡동사니 스킬북 — PDF 파싱, 토스트 알림, 문서 크롤, FSD 지식팩 등 (개인 트랙) | [README](misc/README.md) |
 
